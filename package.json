@@ -1,0 +1,17 @@
+{
+  "name": "argie",
+  "version": "0.1",
+  "private": true,
+  "scripts": {
+    "test": "node tests/runTests"
+  },
+  "dependencies": {
+	  "mongodb": "*",
+    "async": "*",
+    "mongoskin": "0.5.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/trflagg/argie"
+  },
+}

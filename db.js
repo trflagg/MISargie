@@ -4,7 +4,7 @@ var environment,
 
 module.exports.init = function(env) {
     _environment = env;
-    _db = mongo.db(env.db.URL);
+    _db = mongo.db(env.db.URL, {safe: true});
     return _db;
 };
 

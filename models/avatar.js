@@ -1,22 +1,22 @@
 module.exports = function(db) {
     var Model = require('./Model');
 
-    var Player = function(db) {
+    var Avatar = function(db) {
         Model.call(this);
         
         this.globals = {};
 
     }
-    Player.prototype = new Model();
-    Player.prototype.constructor = Player();
+    Avatar.prototype = new Model();
+    Avatar.prototype.constructor = Avatar();
 
-    Player.prototype.save = function(callback) {
-        db.players.update({
+    Avatar.prototype.save = function(callback) {
+        db.Avatars.update({
             "globals" : this.globals
         },)
     };
 
-    Player.prototype.setGlobal = function(key, value, callback) {
+    Avatar.prototype.setGlobal = function(key, value, callback) {
         this.globals[key] = value;
 
         if (typeof callback === 'function') {
@@ -26,7 +26,7 @@ module.exports = function(db) {
         return this;
     };
 
-    Player.prototype.getGlobal = function(key) {
+    Avatar.prototype.getGlobal = function(key) {
         if (!this.globals || !this.globals[key]) {
             return null;
         }

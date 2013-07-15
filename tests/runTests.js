@@ -20,6 +20,10 @@ module.exports.runTests = function() {
             function(callback) {
                 console.log('');
                 require('./avatarTest')(db, callback);
+            },
+            function(callback) {
+                console.log('');
+                require('./messageHolderTest')(db, callback);
             }
         ],
         function(err, results) {

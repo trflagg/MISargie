@@ -30,6 +30,22 @@ module.exports = function(db, callback) {
                     assert.equal(obj['Red Alert'], 'G1_RED_ALERT');
                     assert.equal(obj['Green Alert'], 'G1_GREEN_ALERT');
 
+                    var weapons = new MessageHolder();
+                    weapons.addMessage('Fire Lasers', 'G1_FIRE_LASERS');
+                    weapons.addMessage('Fire Torpedos', 'G1_FIRE_TORPEDOS');
+                    messageHolder.addChild('Weapons', weapons);
+                    var shields = new MessageHolder();
+                    shields.addMessage('Shields Up', 'G1_SHIELDS_UP');
+                    shields.addMessage('Shields Fullstrenght', 'G1_SHEILDS_FULL');
+                    messageHolder.addChild('Shields', shields);
+
+                    var obj = messageHolder.toObject();
+                    assert.equal(obj['Weapons']['Fire Lasers'], 'G1_FIRE_LASERS');
+                    assert.equal(obj['Shields']['Shields Fullstrenght'], 'G1_SHEILDS_FULL');
+
+                    assert.equal(messageHolder.child('Weapons'), weapons);
+                    messageHolder.removeChild('Weapons');
+                    assert.equal(messageHolder.child('Weapons'), null);
                     callback(null);
                 })
             });

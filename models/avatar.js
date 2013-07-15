@@ -1,14 +1,9 @@
 module.exports = function(db) {
-    var Model = require('./Model');
 
-    var Avatar = function(db) {
-        Model.call(this);
-        
+    var Avatar = function() {
         this._globals = {};
 
     }
-    Avatar.prototype = new Model();
-    Avatar.prototype.constructor = Avatar();
 
     Avatar.prototype.save = function(callback) {
 
@@ -31,7 +26,7 @@ module.exports = function(db) {
             upsert: true
         }, 
         function() {
-            callback();
+            callback(null);
         })
     };
 

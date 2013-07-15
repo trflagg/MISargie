@@ -16,14 +16,16 @@ module.exports = function(db, callback) {
             var avatar = new Avatar();
             avatar.setName('Joe');
             avatar.setGlobal('level', 1);
-            avatar.save();
-
-            var avatar = new Avatar();
             avatar.save(function(error, result) {
-                assert.equal(error, 'Avatar save failed: name required.');
-            })
+                assert.equal(error, null);
 
-            callback(null);
+                var avatar = new Avatar();
+                avatar.save(function(error, result) {
+                    assert.equal(error, 'Avatar save failed: name required.');
+                })
+
+                callback(null);
+            });
         },
 
         function(callback) {

@@ -28,7 +28,7 @@ module.exports = function(db, collectionName) {
         return Object.keys(this._messages);
     };
 
-    MessageHolder.prototype.runMessage = function(commandText, ship, callback) {
+    MessageHolder.prototype.runMessage = function(commandText, avatar, callback) {
         var messageName = this._messages[commandText];
         if (!messageName) {
             return callback("Message with commandText "+commandText+ " not found.");

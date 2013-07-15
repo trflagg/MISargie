@@ -31,7 +31,7 @@ module.exports = function(db, callback) {
                 assert.equal(avatar.getName(), 'Joe');
                 assert.equal(avatar.getGlobal('level'), 1);
                 callback(null);
-            })    
+            });
         }
 
     ],

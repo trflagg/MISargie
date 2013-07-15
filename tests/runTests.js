@@ -24,6 +24,10 @@ module.exports.runTests = function() {
             function(callback) {
                 console.log('');
                 require('./messageHolderTest')(db, callback);
+            },
+            function(callback) {
+                console.log('');
+                require('./messageTest')(db, callback);
             }
         ],
         function(err, results) {

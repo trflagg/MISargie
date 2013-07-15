@@ -6,23 +6,22 @@
 module.exports = function(db, callback) {
 
     var async = require('async'),
-        Player = require('../models/Player');
+        Player = require('../models/Avatar');
 
-    console.log('_ Begin playerTest ___');
+    console.log('_ Begin avatarTest ___');
 
     async.waterfall([
         function(callback) {
-            var player = new Player();
+            var avatar = new Avatar();
 
-            player.setGlobal('name', 'Taylor');
-            player.save();
+            avatar.save();
 
             callback(null);
         }
 
     ],
         function(err, result) {
-            console.log('_ End playerTest _____');
+            console.log('_ End avatarTest _____');
             callback();
         }
     );

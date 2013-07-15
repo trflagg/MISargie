@@ -11,7 +11,15 @@ module.exports = function(db, callback) {
 
     async.waterfall([
             function(callback) {
-                callback(null);
+                db.collection('avatars').drop();
+                // make avatar
+                db.collection('avatars').insert({
+                    name: 'Taylor'
+                }, function(err, result) {
+                    if (err) throw err;
+                    console.log(result);
+                    callback(null);
+                });
             },
 
         ],

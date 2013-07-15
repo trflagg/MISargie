@@ -7,20 +7,20 @@ module.exports = function(db, callback) {
 
     var async = require('async'),
         assert = require('assert'),
-        Avatar = require('../models/Avatar')(db);
+        ava = require('../models/Avatar')(db);   
 
     console.log('_ Begin avatarTest ___');
 
     async.waterfall([
         function(callback) {
-            var avatar = new Avatar();
+            var avatar = new ava.Avatar();
             avatar.setName('Joe');
             avatar.setGlobal('level', 1);
             avatar.save(function(error, result) {
                 assert.equal(error, null);
                 assert.equal(result.name, 'Joe');
 
-                var avatar = new Avatar();
+                var avatar = new ava.Avatar();
                 avatar.save(function(error, result) {
                     assert.equal(error, 'Avatar save failed: name required.');
                 })
@@ -30,7 +30,12 @@ module.exports = function(db, callback) {
         },
 
         function(callback) {
-            callback(null);
+            ava.load('Joe', function(error, avatar) {
+                assert.equal(error, null);
+                assert.equal(avatar.getName(), 'Joe');
+                assert.equal(avatar.getGlobal('level'), 1);
+                callback(null);
+            })    
         }
 
     ],

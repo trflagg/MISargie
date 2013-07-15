@@ -1,6 +1,7 @@
-module.exports = function(db) {
+module.exports = function(db, collectionName) {
 
     var returnObject = {};
+    var collectionName = collectionName || 'avatars';
 
     returnObject.load = function(name, callback) {
         if (name === undefined) {
@@ -8,7 +9,7 @@ module.exports = function(db) {
         }
 
         // load from db
-        db.collection('avatars').findOne({name: name}, function(error, result) {
+        db.collection(collectionName).findOne({name: name}, function(error, result) {
             if (error) {
                 return callback(error, null);
             }   
@@ -43,7 +44,7 @@ module.exports = function(db) {
         }
 
         // save
-        db.collection('avatars').save({
+        db.collection(collectionName).save({
             name: this._name,
             globals: this._globals
         }, 

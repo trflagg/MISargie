@@ -17,7 +17,6 @@ module.exports = function(db, callback) {
                     name: 'Taylor'
                 }, function(err, result) {
                     if (err) throw err;
-                    console.log(result);
                     callback(null);
                 });
             },

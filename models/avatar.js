@@ -25,8 +25,8 @@ module.exports = function(db) {
         {
             upsert: true
         }, 
-        function() {
-            callback(null);
+        function(error, result) {
+            callback(error, result);
         })
     };
 

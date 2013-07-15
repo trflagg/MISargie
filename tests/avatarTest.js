@@ -18,6 +18,7 @@ module.exports = function(db, callback) {
             avatar.setGlobal('level', 1);
             avatar.save(function(error, result) {
                 assert.equal(error, null);
+                assert.equal(result.name, 'Joe');
 
                 var avatar = new Avatar();
                 avatar.save(function(error, result) {

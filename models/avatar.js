@@ -15,7 +15,7 @@ module.exports = function(db) {
         // validate name
         if (this._name === undefined) {
             if (callback) {
-                return callback('Avatar save failed: name required.');
+                return callback('Avatar save failed: name required.', null);
             }
             else {
                 throw 'Avatar save failed: name required.';
@@ -51,7 +51,6 @@ module.exports = function(db) {
 
         return this;
     };
-
     Avatar.prototype.getGlobal = function(key) {
         if (!this._globals || !this._globals[key]) {
             return null;

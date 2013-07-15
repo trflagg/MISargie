@@ -6,6 +6,7 @@
 module.exports = function(db, callback) {
 
     var async = require('async'),
+        assert = require('assert'),
         Avatar = require('../models/Avatar')(db);
 
     console.log('_ Begin avatarTest ___');
@@ -17,6 +18,15 @@ module.exports = function(db, callback) {
             avatar.setGlobal('level', 1);
             avatar.save();
 
+            var avatar = new Avatar();
+            avatar.save(function(error, result) {
+                assert.equal(error, 'Avatar save failed: name required.');
+            })
+
+            callback(null);
+        },
+
+        function(callback) {
             callback(null);
         }
 

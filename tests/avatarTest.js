@@ -6,14 +6,15 @@
 module.exports = function(db, callback) {
 
     var async = require('async'),
-        Player = require('../models/Avatar');
+        Avatar = require('../models/Avatar')(db);
 
     console.log('_ Begin avatarTest ___');
 
     async.waterfall([
         function(callback) {
             var avatar = new Avatar();
-
+            avatar.setName('Joe');
+            avatar.setGlobal('level', 1);
             avatar.save();
 
             callback(null);

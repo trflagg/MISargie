@@ -19,7 +19,7 @@ module.exports.runTests = function() {
             },
             function(callback) {
                 console.log('');
-                callback();
+                require('./avatarTest')(db, callback);
             }
         ],
         function(err, results) {

@@ -7,6 +7,7 @@ module.exports = function(db, callback) {
     console.log('_ Begin messageTest ___');
 
     async.waterfall([
+        // create and compile simple message.
         function(callback) {
             var message = new msg.Message();
             message.setName('Hello');
@@ -18,9 +19,9 @@ module.exports = function(db, callback) {
             assert.equal(message.getCompiled().text, 'Hello world!');
             assert.equal(message.getCompiled().nextSibling, null);
             callback(null);
-
         },
 
+        // load, compile, and save a message;
         function(callback) {
             msg.load('G1_RED_ALERT', function(err, foundMessage) {
                 assert.equal(err, null);

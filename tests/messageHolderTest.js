@@ -3,11 +3,13 @@ module.exports = function(db, callback) {
 
     var async = require('async'),
         assert = require('assert'),
-        MessageHolder = require('../models/MessageHolder')(db);   
+        MessageHolder = require('../models/MessageHolder')(db),
+        ava = require('../models/Avatar')(db);
 
     console.log('_ Begin messageHolderTest ___');
 
     async.waterfall([
+        // simple tests
         function(callback) {
             var messageHolder = new MessageHolder();
             messageHolder.addMessage('Red Alert', 'G1_RED_ALERT');
@@ -36,20 +38,50 @@ module.exports = function(db, callback) {
                     messageHolder.addChild('Weapons', weapons);
                     var shields = new MessageHolder();
                     shields.addMessage('Shields Up', 'G1_SHIELDS_UP');
-                    shields.addMessage('Shields Fullstrenght', 'G1_SHEILDS_FULL');
+                    shields.addMessage('Shields Fullstrength', 'G1_SHEILDS_FULL');
                     messageHolder.addChild('Shields', shields);
 
                     var obj = messageHolder.toObject();
                     assert.equal(obj['Weapons']['Fire Lasers'], 'G1_FIRE_LASERS');
-                    assert.equal(obj['Shields']['Shields Fullstrenght'], 'G1_SHEILDS_FULL');
+                    assert.equal(obj['Shields']['Shields Fullstrength'], 'G1_SHEILDS_FULL');
 
                     assert.equal(messageHolder.child('Weapons'), weapons);
                     messageHolder.removeChild('Weapons');
                     assert.equal(messageHolder.child('Weapons'), null);
-                    callback(null);
-                })
+                    callback(null, messageHolder);
+                });
             });
         },
+
+        // avatar as messageHolder
+        function(messageHolder, callback) {
+            ava.load('Joe', function(err, avatar) {
+                assert.equal(err, null);
+                avatar.addMessage('Hail Ship', 'G1_HAIL_SHIP');
+                assert.equal('G1_HAIL_SHIP', avatar.message('Hail Ship'));
+                avatar.addChild('Shields', messageHolder.child('Shields'));
+                var weapons = new MessageHolder();
+                weapons.addMessage('Fire Lasers', 'G1_FIRE_LASERS');
+                weapons.addMessage('Fire Torpedos', 'G1_FIRE_TORPEDOS');
+                avatar.addChild('Weapons', weapons);
+                
+                avatar.save(function(err, result) {
+                    assert.equal(err, null);
+                    callback(null);
+                });
+            });
+        },
+
+        // load avatar with messages
+        function(callback) {
+            ava.load('Joe', function(err, avatar) {
+                assert.equal(err, null);
+                console.log(avatar);
+                assert.equal(avatar.messageCount(), 1);
+                assert.equal(avatar.child('Shields').message('Sheilds Up'), 'G1_SHIELDS_UP');
+                callback(null);
+            });
+        }
 
     ],
         function(err, result) {

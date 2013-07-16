@@ -1,7 +1,9 @@
 module.exports = function(db, collectionName) {
 
-    var returnObject = {};
-    var collectionName = collectionName || 'avatars';
+    var util = require('util'),
+        MessageHolder = require('./messageHolder')(db),
+        returnObject = {},
+        collectionName = collectionName || 'avatars'
 
     returnObject.load = function(name, callback) {
         if (name === undefined) {
@@ -19,19 +21,23 @@ module.exports = function(db, collectionName) {
     }
 
 
-    returnObject.Avatar = function(doc) {
+    Avatar = function(doc) {
         if (doc !== undefined) {
             // load from doc
             this._name = doc.name;
             this._globals = doc.globals;
+            this._messages = doc.messages || {};
+            this._children = doc.children || {};
         }
         else {
+            MessageHolder.call(this);
             // make new Avatar
             this._globals = {};
         }
     }
+    util.inherits(Avatar, MessageHolder);
 
-    returnObject.Avatar.prototype.save = function(callback) {
+    Avatar.prototype.save = function(callback) {
 
         // validate name
         if (this._name === undefined) {
@@ -44,9 +50,12 @@ module.exports = function(db, collectionName) {
         }
 
         // save
+        console.log(this);
         db.collection(collectionName).save({
             name: this._name,
-            globals: this._globals
+            globals: this._globals,
+            messages: this._messages,
+            children: this._children
         }, 
         {
             upsert: true
@@ -56,14 +65,14 @@ module.exports = function(db, collectionName) {
         })
     };
 
-    returnObject.Avatar.prototype.setName = function(name) {
+    Avatar.prototype.setName = function(name) {
         this._name = name;
     }
-    returnObject.Avatar.prototype.getName = function() {
+    Avatar.prototype.getName = function() {
         return this._name;
     }
 
-    returnObject.Avatar.prototype.setGlobal = function(key, value, callback) {
+    Avatar.prototype.setGlobal = function(key, value, callback) {
         this._globals[key] = value;
 
         if (typeof callback === 'function') {
@@ -72,13 +81,15 @@ module.exports = function(db, collectionName) {
 
         return this;
     };
-    returnObject.Avatar.prototype.getGlobal = function(key) {
+    Avatar.prototype.getGlobal = function(key) {
         if (!this._globals || !this._globals[key]) {
             return null;
         }
 
         return this._globals[key];
     };
+
+    returnObject.Avatar = Avatar;
 
     return returnObject;
         

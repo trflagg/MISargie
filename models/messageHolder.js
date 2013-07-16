@@ -21,6 +21,9 @@ module.exports = function(db, collectionName) {
     MessageHolder.prototype.removeMessage = function(commandText) {
         delete this._messages[commandText];
     };
+    MessageHolder.prototype.message = function(commandText) {
+        return this._messages[commandText];
+    }
     MessageHolder.prototype.messageCount = function() {
         return Object.keys(this._messages).length;
     };

@@ -10,16 +10,29 @@ module.exports = function(db, callback) {
     console.log('_ Begin databaseInit ___');
 
     async.waterfall([
+            
+            // make avatar
             function(callback) {
                 db.collection('avatars').drop();
-                // make avatar
                 db.collection('avatars').insert({
                     name: 'Taylor'
                 }, function(err, result) {
-                    if (err) throw err;
+                    console.log("created avatar.");
                     callback(null);
                 });
             },
+
+            // make message
+            function(callback) {
+                db.collection('messages').drop();
+                db.collection('messages').insert({
+                    name: 'G1_RED_ALERT',
+                    text: 'Red Alert!\n{% setGlobal(red_alert,1) %}\n Battlestations!'
+                }, function(err, newMessage) {
+                    console.log("created message.");
+                    callback(err);
+                })
+            }
 
         ],
         function(err, result) {

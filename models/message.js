@@ -1,5 +1,7 @@
 module.exports = function(db, collectionName) {
-    var util = require('util');
+    var util = require('util'),
+        returnObject = {},
+        collectionName = collectionName || 'messages';
 
     Node = function() {
 
@@ -22,31 +24,80 @@ module.exports = function(db, collectionName) {
     CodeNode.prototype.func = null;
     CodeNode.prototype.p = [];
 
+    returnObject.load = function(name, callback) {
+        if (name === undefined) {
+            return callback('Message lookup failed: name required.', null);
+        }
 
-    Message = function() {
-        this._name = null;
-        this._text = null;
-        this._compiled = {};
+        // load from db
+        db.collection(collectionName).findOne({name: name}, function(error, result) {
+            if (error) {
+                return callback(error, null);
+            }   
+            var newMessage = new returnObject.Message(result);
+            return callback(null, newMessage);
+        });
     }
 
-    Message.prototype.setName = function(name) {
+    returnObject.Message = function(doc) {
+        if (doc !== undefined) {
+            // load from doc
+            this._name = doc.name;
+            this._text = doc.text;
+            this._compiled = doc.compiled;
+        }
+        else {
+            // make new Message
+            this._name = null;
+            this._text = null;
+            this._compiled = {};
+        }
+    }
+
+    returnObject.Message.prototype.save = function(callback) {
+        // validate name
+        if (this._name === undefined) {
+            if (callback) {
+                return callback('Message save failed: name required.', null);
+            }
+            else {
+                throw 'Message save failed: name required.';
+            }
+        }
+
+        // save
+        db.collection(collectionName).save({
+            name: this._name,
+            text: this._text,
+            compiled: this._compiled
+        }, 
+        {
+            upsert: true
+        }, 
+        function(error, result) {
+            callback(error, result);
+        })
+    };
+
+
+    returnObject.Message.prototype.setName = function(name) {
         this._name = name;
     }
-    Message.prototype.getName = function() {
+    returnObject.Message.prototype.getName = function() {
         return this._name;
     }
 
-    Message.prototype.setText = function(text) {
+    returnObject.Message.prototype.setText = function(text) {
         this._text = text;
     }
-    Message.prototype.getText = function() {
+    returnObject.Message.prototype.getText = function() {
         return this._text;
     }
 
-    Message.prototype.getCompiled = function() {
+    returnObject.Message.prototype.getCompiled = function() {
         return this._compiled;
     }
-    Message.prototype.compile = function() {
+    returnObject.Message.prototype.compile = function() {
         if (this.text === null) {
             this._compiled = null;
             return null;
@@ -111,7 +162,7 @@ module.exports = function(db, collectionName) {
     };
 
 
-    Message.prototype.run = function(avatar) {
+    returnObject.Message.prototype.run = function(avatar) {
         if (this._compiled === null) {
             return null;
         }
@@ -157,5 +208,5 @@ module.exports = function(db, collectionName) {
 
     }
 
-    return Message;
+    return returnObject;
 };

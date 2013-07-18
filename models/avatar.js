@@ -15,6 +15,10 @@ module.exports = function(db, collectionName) {
         return "avatars";
     }
 
+    Avatar = function(doc) {
+       Avatar.super_.call(this, doc);
+    }
+
     Avatar.prototype.loadFromDoc = function(doc) {
         Avatar.super_.prototype.loadFromDoc.call(this, doc);
         this._name = doc.name;

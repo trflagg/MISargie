@@ -2,15 +2,10 @@ module.exports = function(db, collectionName) {
     var util = require('util'),
         Model = require('./model')(db, collectionName);
 
-    MessageHolder = function(condition) {
-        MessageHolder.super_.call(this, condition);
-        this.collectionName = "messageHolders";
+    MessageHolder = function(doc) {
+        MessageHolder.super_.call(this, doc);
     }
     util.inherits(MessageHolder, Model);
-
-    MessageHolder.prototype.getCollectionName = function() {
-        return "messageHolders";
-    }
 
     MessageHolder.prototype.loadFromDoc = function(doc) {
         MessageHolder.super_.prototype.loadFromDoc.call(this, doc);

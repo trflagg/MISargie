@@ -6,39 +6,24 @@ module.exports = function(db, collectionName) {
         returnObject = {},
         collectionName = collectionName || 'avatars'
 
-    returnObject.load = function(name, callback) {
-        if (name === undefined) {
-            return callback('Avatar lookup failed: name required.', null);
-        }
-
-        // load from db
-        db.collection(collectionName).findOne({name: name}, function(error, result) {
-            if (error) {
-                return callback(error, null);
-            }   
-            var newAvatar = new returnObject.Avatar(result);
-            return callback(null, newAvatar);
-        });
-    }
-
-
-    Avatar = function(doc) {
-        if (doc !== undefined) {
-            // load from doc
-            this._id = doc._id;
-            this._name = doc.name;
-            this._globals = doc.globals;
-            this._messages = doc.messages || {};
-            this._children = doc.children || {};
-        }
-        else {
-            MessageHolder.call(this);
-            // make new Avatar
-            this._globals = {};
-            this._id = new ObjectID();
-        }
+    Avatar = function(condition) {
+       Avatar.super_.call(this, condition);
     }
     util.inherits(Avatar, MessageHolder);
+
+    Avatar.prototype.getCollectionName = function() {
+        return "avatars";
+    }
+
+    Avatar.prototype.loadFromDoc = function(doc) {
+        Avatar.super_.prototype.loadFromDoc.call(this, doc);
+        this._name = doc.name;
+        this._globals = doc.globals;
+    }
+    Avatar.prototype.createNew = function() {
+        Avatar.super_.prototype.createNew.call(this);
+        this._globals = {};
+    }
 
     Avatar.prototype.save = function(callback) {
 

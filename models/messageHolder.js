@@ -1,6 +1,24 @@
 module.exports = function(db, collectionName) {
+    var util = require('util'),
+        Model = require('./model')(db, collectionName);
 
-    MessageHolder = function() {
+    MessageHolder = function(condition) {
+        MessageHolder.super_.call(this, condition);
+        this.collectionName = "messageHolders";
+    }
+    util.inherits(MessageHolder, Model);
+
+    MessageHolder.prototype.getCollectionName = function() {
+        return "messageHolders";
+    }
+
+    MessageHolder.prototype.loadFromDoc = function(doc) {
+        MessageHolder.super_.prototype.loadFromDoc.call(this, doc);
+        this._messages = doc.messages;
+        this._children = doc.children;
+    }
+    MessageHolder.prototype.createNew = function() {
+        MessageHolder.super_.prototype.createNew.call(this);
         this._messages = {};
         this._children = {};
     }

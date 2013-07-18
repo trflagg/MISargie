@@ -25,7 +25,7 @@ module.exports = function(db, callback) {
         },
 
         function(callback) {
-            ava.load('Joe', function(error, avatar) {
+            Avatar.load({name: 'Joe'}, function(error, avatar) {
                 assert.equal(error, null);
                 assert.equal(avatar.getName(), 'Joe');
                 assert.equal(avatar.getGlobal('level'), 1);

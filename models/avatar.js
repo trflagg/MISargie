@@ -1,6 +1,7 @@
 module.exports = function(db, collectionName) {
 
     var util = require('util'),
+        ObjectID = require('mongodb').ObjectID,
         MessageHolder = require('./messageHolder')(db),
         returnObject = {},
         collectionName = collectionName || 'avatars'
@@ -24,6 +25,7 @@ module.exports = function(db, collectionName) {
     Avatar = function(doc) {
         if (doc !== undefined) {
             // load from doc
+            this._id = doc._id;
             this._name = doc.name;
             this._globals = doc.globals;
             this._messages = doc.messages || {};
@@ -33,6 +35,7 @@ module.exports = function(db, collectionName) {
             MessageHolder.call(this);
             // make new Avatar
             this._globals = {};
+            this._id = new ObjectID();
         }
     }
     util.inherits(Avatar, MessageHolder);
@@ -50,8 +53,8 @@ module.exports = function(db, collectionName) {
         }
 
         // save
-        console.log(this);
         db.collection(collectionName).save({
+            _id: this._id,
             name: this._name,
             globals: this._globals,
             messages: this._messages,
@@ -60,8 +63,8 @@ module.exports = function(db, collectionName) {
         {
             upsert: true
         }, 
-        function(error, result) {
-            callback(error, result);
+        function(error) {
+            callback(error);
         })
     };
 

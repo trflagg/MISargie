@@ -76,9 +76,8 @@ module.exports = function(db, callback) {
         function(callback) {
             ava.load('Joe', function(err, avatar) {
                 assert.equal(err, null);
-                console.log(avatar);
                 assert.equal(avatar.messageCount(), 1);
-                assert.equal(avatar.child('Shields').message('Sheilds Up'), 'G1_SHIELDS_UP');
+                assert.equal(avatar.child('Shields')._messages['Shields Up'], 'G1_SHIELDS_UP');
                 callback(null);
             });
         }

@@ -1,38 +1,22 @@
 module.exports = function(db) {
-
     var ObjectID = require('mongodb').ObjectID;
 
-    Model = function(condition) {
-        if (condition !== undefined) {
-            return this.load(condition);
+    // not sure what to do with this yet.
+    Model = function(doc) {
+        if (doc) {
+            this._id = doc._id;
         }
         else {
             this._id = new ObjectID();
-            return this.createNew();
         }
     }
 
-    Model.prototype.getCollectionName = function() {
-        return "models";
-    }
+    Model.prototype.onSave = function(model) {
+        var doc = {};
 
-    Model.prototype.loadFromDoc = function(doc) {
+        doc._id = model._id;
 
-    }
-
-    Model.prototype.createNew = function() {
-
-    }
-
-    Model.load = function(condition, callback) {
-         // load from db
-        db.collection(this.getCollectionName()).findOne(condition, function(error, result) {
-            if (error) {
-                return callback(error, null);
-            }
-
-            return callback(null, this.loadFromDoc(result));
-        });
+        return doc;
     }
 
     return Model;

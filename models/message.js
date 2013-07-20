@@ -1,6 +1,6 @@
 module.exports = function(db, collectionName) {
     var util = require('util'),
-        returnObject = {},
+        Model = require('./Model')(db),
         collectionName = collectionName || 'messages';
 
     Node = function() {
@@ -24,22 +24,7 @@ module.exports = function(db, collectionName) {
     CodeNode.prototype.func = null;
     CodeNode.prototype.p = [];
 
-    returnObject.load = function(name, callback) {
-        if (name === undefined) {
-            return callback('Message lookup failed: name required.', null);
-        }
-
-        // load from db
-        db.collection(collectionName).findOne({name: name}, function(error, result) {
-            if (error) {
-                return callback(error, null);
-            }   
-            var newMessage = new returnObject.Message(result);
-            return callback(null, newMessage);
-        });
-    }
-
-    returnObject.Message = function(doc) {
+    Message = function(doc) {
         if (doc !== undefined) {
             // load from doc
             this._name = doc.name;
@@ -53,51 +38,42 @@ module.exports = function(db, collectionName) {
             this._compiled = {};
         }
     }
+    util.inherits(Message, Model);
 
-    returnObject.Message.prototype.save = function(callback) {
+    Message.prototype.onSave = function(message) {
         // validate name
-        if (this._name === undefined) {
-            if (callback) {
-                return callback('Message save failed: name required.', null);
-            }
-            else {
-                throw 'Message save failed: name required.';
-            }
+        if (message._name === undefined) {
+            throw 'Message save validation failed: name required.';
         }
 
-        // save
-        db.collection(collectionName).save({
-            name: this._name,
-            text: this._text,
-            compiled: this._compiled
-        }, 
-        {
-            upsert: true
-        }, 
-        function(error, result) {
-            callback(error, result);
-        })
+        var doc = Message.super_.prototype.onSave(message);
+
+        doc.name = message._name;
+        doc.text = message._text;
+        doc.compiled = message._compiled;
+
+        return doc;
     };
 
 
-    returnObject.Message.prototype.setName = function(name) {
+    Message.prototype.setName = function(name) {
         this._name = name;
     }
-    returnObject.Message.prototype.getName = function() {
+    Message.prototype.getName = function() {
         return this._name;
     }
 
-    returnObject.Message.prototype.setText = function(text) {
+    Message.prototype.setText = function(text) {
         this._text = text;
     }
-    returnObject.Message.prototype.getText = function() {
+    Message.prototype.getText = function() {
         return this._text;
     }
 
-    returnObject.Message.prototype.getCompiled = function() {
+    Message.prototype.getCompiled = function() {
         return this._compiled;
     }
-    returnObject.Message.prototype.compile = function() {
+    Message.prototype.compile = function() {
         if (this.text === null) {
             this._compiled = null;
             return null;
@@ -162,7 +138,7 @@ module.exports = function(db, collectionName) {
     };
 
 
-    returnObject.Message.prototype.run = function(avatar) {
+    Message.prototype.run = function(avatar) {
         if (this._compiled === null) {
             return null;
         }
@@ -208,5 +184,7 @@ module.exports = function(db, collectionName) {
 
     }
 
-    return returnObject;
+    db.register('Message', Message);
+
+    return Message;
 };

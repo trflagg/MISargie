@@ -13,8 +13,8 @@ module.exports = function(db, callback) {
             
             // make avatar
             function(callback) {
-                db.collection('avatars').drop();
-                db.collection('avatars').insert({
+                db._db.collection('avatar').drop();
+                db._db.collection('avatar').insert({
                     name: 'Taylor'
                 }, function(err, result) {
                     console.log("created avatar.");
@@ -24,8 +24,8 @@ module.exports = function(db, callback) {
 
             // make message
             function(callback) {
-                db.collection('messages').drop();
-                db.collection('messages').insert({
+                db._db.collection('message').drop();
+                db._db.collection('message').insert({
                     name: 'G1_RED_ALERT',
                     text: 'Red Alert!\n{% setGlobal(red_alert,1) %}\n Battlestations!'
                 }, function(err, newMessage) {

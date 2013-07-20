@@ -4,18 +4,27 @@ module.exports = function(db, collectionName) {
 
     MessageHolder = function(doc) {
         MessageHolder.super_.call(this, doc);
+
+        if (doc) {
+            // load from doc
+            this._messages = doc.messages;
+            this._children = doc.children;
+        }
+        else {
+            // create new
+            this._messages = {};
+            this._children = {};
+        }
     }
     util.inherits(MessageHolder, Model);
 
-    MessageHolder.prototype.loadFromDoc = function(doc) {
-        MessageHolder.super_.prototype.loadFromDoc.call(this, doc);
-        this._messages = doc.messages;
-        this._children = doc.children;
-    }
-    MessageHolder.prototype.createNew = function() {
-        MessageHolder.super_.prototype.createNew.call(this);
-        this._messages = {};
-        this._children = {};
+    MessageHolder.prototype.onSave = function(messageHolder) {
+        var doc = MessageHolder.super_.prototype.onSave(messageHolder);
+
+        doc.messages = messageHolder._messages;
+        doc.children = messageHolder._children;
+
+        return doc;
     }
 
     MessageHolder.prototype.addChild = function(name, child) {

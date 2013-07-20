@@ -9,7 +9,7 @@ module.exports = function(db, callback) {
     async.waterfall([
         // create and compile simple message.
         function(callback) {
-            var message = new msg.Message();
+            var message = db.create('Message');
             message.setName('Hello');
             assert.equal(message.getName(), 'Hello');
             message.setText('Hello world!');
@@ -23,7 +23,7 @@ module.exports = function(db, callback) {
 
         // load, compile, and save a message;
         function(callback) {
-            msg.load('G1_RED_ALERT', function(err, foundMessage) {
+            db.load('Message', {name: 'G1_RED_ALERT'}, function(err, foundMessage) {
                 assert.equal(err, null);
                 var node = foundMessage.compile();
                 assert.notEqual(node, 'hello');
@@ -31,7 +31,7 @@ module.exports = function(db, callback) {
                 assert.equal(node.nextSibling.type, 'code');
                 assert.equal(node.nextSibling.p[0], 'red_alert');
                 assert.equal(node.nextSibling.nextSibling.text, 'Battlestations!');
-                foundMessage.save(function(err) {
+                db.save('Message', foundMessage, function(err) {
                     assert.equal(err, null);
                     callback(null);
                 })

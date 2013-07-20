@@ -4,7 +4,7 @@ module.exports = function(db, callback) {
     var async = require('async'),
         assert = require('assert'),
         MessageHolder = require('../models/MessageHolder')(db),
-        ava = require('../models/Avatar')(db);
+        Avatar = require('../models/Avatar')(db);
 
     console.log('_ Begin messageHolderTest ___');
 
@@ -55,7 +55,7 @@ module.exports = function(db, callback) {
 
         // avatar as messageHolder
         function(messageHolder, callback) {
-            ava.load('Joe', function(err, avatar) {
+            db.load('Avatar', {name:'Joe'}, function(err, avatar) {
                 assert.equal(err, null);
                 avatar.addMessage('Hail Ship', 'G1_HAIL_SHIP');
                 assert.equal('G1_HAIL_SHIP', avatar.message('Hail Ship'));
@@ -65,7 +65,7 @@ module.exports = function(db, callback) {
                 weapons.addMessage('Fire Torpedos', 'G1_FIRE_TORPEDOS');
                 avatar.addChild('Weapons', weapons);
                 
-                avatar.save(function(err, result) {
+                db.save('Avatar', avatar, function(err, result) {
                     assert.equal(err, null);
                     callback(null);
                 });
@@ -74,7 +74,7 @@ module.exports = function(db, callback) {
 
         // load avatar with messages
         function(callback) {
-            ava.load('Joe', function(err, avatar) {
+            db.load('Avatar', {name: 'Joe'}, function(err, avatar) {
                 assert.equal(err, null);
                 assert.equal(avatar.messageCount(), 1);
                 assert.equal(avatar.child('Shields')._messages['Shields Up'], 'G1_SHIELDS_UP');

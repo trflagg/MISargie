@@ -2,16 +2,16 @@
  * Create connection to testdb and run all tests.
  */
 module.exports.runTests = function() {
-
     var assert = require('assert'),
-         async = require('async');
+         async = require('async'),
+         Db = require('../db')(environment);
 
 
     console.log('\n________ Running All Tests ____________');
 
     // load service based on environment
     var environment = require('../environments/environment-test');
-    var db = require('../db').init(environment);
+    var db = new Db(environment);
 
     async.series([
             function(callback) {

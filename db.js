@@ -1,38 +1,63 @@
-var mongo = require('mongoskin');
+var mongo = require('mongoskin'),
+    ObjectID = require('mongodb').ObjectID;
 
-module.exports.init = function(env) {
-    _environment = env;
-    _db = mongo.db(env.db.URL, {safe: true});
-    return _db;
-};
 
-module.exports.db = function() {
-    return _db;
-}
-
-module.export = function(environment) {
+module.exports = function(environment) {
 
     Db = function(environment) {
-        this._environment = env;
-        this._db = mongo.db(env.db.URL, {safe: true});
+        this._environment = environment;
+        this._db = mongo.db(environment.db.URL, {safe: true});
         this._models = {};
-        this._events = {};
+    };
+
+    Db.prototype.close = function() {
+        this._db.close();
     }
     
     Db.prototype.register = function(modelName, constructor) {
         this._models[modelName] = constructor;
-        this._events[modelName] = {};
-    }
+    };
 
-    Db.prototype.create = function(modelName, args) {
-        return new this._models[modelName](agrs);
-    }
+    Db.prototype.create = function(modelName) {
+        var newModel = new this._models[modelName]();
+        newModel._id = new ObjectID();
+        return newModel;
+    };
 
     Db.prototype.save = function(modelName, model, callback) {
-        this._db.collection(this.getCollectionName(modelName)).save({
-    }
+        if (this._models[modelName].prototype.onSave) {
+            try {
+                model = this._models[modelName].prototype.onSave(model);
+            } catch(e) {
+                return callback(e.toString(), null);
+            }
+        }
 
-    Db.prototype.getCollectionName(modelName) {
+        // save to db
+        this._db.collection(this.getCollectionName(modelName)).save(
+            model,
+            {upsert: true},
+            callback
+        );
+    };
+
+    Db.prototype.load = function(modelName, condition, callback) {
+        // callback variable
+        var db = this;
+
+        // load from db
+        this._db.collection(this.getCollectionName(modelName)).findOne(condition, function(error, result) {
+            if (error) {
+                return callback(error, null);
+            }
+
+            return callback(null, new db._models[modelName](result));
+        });
+    };
+
+    Db.prototype.getCollectionName = function(modelName) {
         return modelName.toLowerCase();
-    }
+    };
+
+    return Db;
 }

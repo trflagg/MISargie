@@ -25,6 +25,8 @@ module.exports = function(db, collectionName) {
     CodeNode.prototype.p = [];
 
     Message = function(doc) {
+        Message.super_.call(this, doc);
+
         if (doc !== undefined) {
             // load from doc
             this._name = doc.name;

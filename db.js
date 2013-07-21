@@ -2,7 +2,7 @@ var mongo = require('mongoskin'),
     ObjectID = require('mongodb').ObjectID;
 
 
-module.exports = function(environment) {
+module.exports = function() {
 
     Db = function(environment) {
         this._environment = environment;

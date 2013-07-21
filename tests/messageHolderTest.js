@@ -78,8 +78,18 @@ module.exports = function(db, callback) {
                 assert.equal(err, null);
                 assert.equal(avatar.messageCount(), 1);
                 assert.equal(avatar.child('Shields')._messages['Shields Up'], 'G1_SHIELDS_UP');
-                callback(null);
+                callback(null, avatar);
             });
+        },
+
+        // addMessage to child
+        function(avatar, callback) {
+            avatar.addMessage('Power down', 'G1_POWER_DOWN', 'Weapons');
+            assert.equal(avatar.child('Weapons')._messages['Power down'], 'G1_POWER_DOWN');
+            avatar.child('Weapons').addChild('Energy', new MessageHolder());
+            avatar.addMessage('Power up', 'G1_POWER_UP', 'Weapons.Energy');
+            assert.equal(avatar.child('Weapons').child('Energy')._messages['Power up'], 'G1_POWER_UP');
+            callback(null);
         }
 
     ],

@@ -20,7 +20,6 @@ module.exports = function(environment) {
 
     Db.prototype.create = function(modelName) {
         var newModel = new this._models[modelName]();
-        newModel._id = new ObjectID();
         return newModel;
     };
 
@@ -32,7 +31,6 @@ module.exports = function(environment) {
                 return callback(e.toString(), null);
             }
         }
-
         // save to db
         this._db.collection(this.getCollectionName(modelName)).save(
             model,

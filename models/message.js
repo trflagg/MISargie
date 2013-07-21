@@ -123,7 +123,7 @@ module.exports = function(db, collectionName) {
 
             // setGlobal(globalName, value)
             case 'setGlobal':
-                newNode.func = "setGlobal"
+                newNode.func = "setGlobal";
                 if (params.length < 2) {
                     console.log("error: setGlobal needs 2 params");
                     return null;
@@ -134,6 +134,36 @@ module.exports = function(db, collectionName) {
                 // console.log('setGlobal code node created.');
                 newNode.nextSibling = createNode(lines);
                 break;
+
+            // getGlobal(globalName)
+            case 'getGlobal':
+                newNode.func = "getGlobal";
+                if (params.length < 1) {
+                    console.log("error: getGlobal needs 1 param.");
+                    return null;
+                }
+                newNode.p = [];
+                newNode.p[0] = params[0].trim();
+                newNode.nextSibling = createNode(lines);
+                break;
+
+            // addMessage(messageText, messageName, [child])
+            case 'addMessage':
+                newNode.func = "addMessage";
+                if (params.length < 2) {
+                    console.log("error: addMessage needs at least 2 params.");
+                    return null;
+                }
+                newNode.p = [];
+                newNode.p[0] = params[0].trim();
+                newNode.p[1] = params[1].trim();
+                newNode.p[2] = null;
+                if (params[2]) {
+                    newNode.p[2] = params[2];
+                }
+                newNode.nextSibling = createNode(lines);
+                break;
+
         }
 
         return newNode
@@ -164,7 +194,6 @@ module.exports = function(db, collectionName) {
         console.log('unknown node type')
         return message;
     }
-
     var runCodeNode = function(node, message, avatar) {
         if (node === null) {
             return message;
@@ -172,11 +201,19 @@ module.exports = function(db, collectionName) {
 
         switch(node.func) {
             case 'setGlobal':
-                if (node.p.length < 2) {
-                    console.log("error: setGlobal needs 2 params");
-                    return message;
-                }
                 avatar.setGlobal(node.p[0], node.p[1])
+                return runNode(node.nextSibling, message, avatar);
+                break;
+
+            case 'getGlobal':
+                if (avatar.getGlobal(node.p[0])) {
+                    message = message.concat(node.p[0]);
+                }
+                return runNode(node.nextSibling, message, avatar);
+                break;
+
+            case 'addMessage':
+                avatar.addMessage(node.p[0], node.p[1], node.p[2]);
                 return runNode(node.nextSibling, message, avatar);
                 break;
         }

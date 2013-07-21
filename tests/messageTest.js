@@ -34,8 +34,8 @@ module.exports = function(db, callback) {
                 db.save('Message', foundMessage, function(err) {
                     assert.equal(err, null);
                     callback(null, foundMessage);
-                })
-            })
+                });
+            });
         },
 
         // run message on an avatar.
@@ -47,6 +47,12 @@ module.exports = function(db, callback) {
                 assert.equal(avatar.getGlobal('red_alert'),1);
                 callback(err, avatar);
             });
+        },
+
+        // test addMessage function.
+        function(avatar, callback) {
+
+            callback(null);
         }
 
     ],

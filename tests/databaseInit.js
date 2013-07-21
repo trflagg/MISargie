@@ -78,7 +78,10 @@ module.exports = function(db, callback) {
                     {% addMessage(Shields up, G2_SHIELDS_UP, ship.shields) %} \n \
                     {% addMessage(Ready weaponse, G2_READY_WEAPONS, ship.weapons) %}');
                 m1.compile();
-                db.save('Message', m1, function(err) { callback(err) });
+                db.save('Message', m1, function(err) {
+                    console.log("created scenario."); 
+                    callback(err) 
+                });
             }
 
         ],

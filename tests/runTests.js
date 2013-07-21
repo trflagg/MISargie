@@ -28,6 +28,10 @@ module.exports.runTests = function() {
             function(callback) {
                 console.log('');
                 require('./messageTest')(db, callback);
+            },
+            function(callback) {
+                console.log('');
+                require('./scenarioTest')(db, callback);
             }
         ],
         function(err, results) {

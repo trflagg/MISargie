@@ -4,25 +4,24 @@ module.exports = function(db, collectionName) {
         collectionName = collectionName || 'messages';
 
     Node = function() {
-
-    }
-    Node.prototype = {
-        type: 'node',
-        nextSibling: { },
+        this.type ='node';
+        this,nextSibling = { };
     }
 
     var TextNode = function() {
+        TextNode.super_.call(this);
+        this.type = 'text';
+        this.text = '';
     }
     util.inherits(TextNode, Node);
-    TextNode.prototype.type = 'text';
-    TextNode.prototype.text = '';
 
     var CodeNode = function() {
+        CodeNode.super_.call(this);
+        this.type = 'code';
+        this.func = null;
+        this.p = [];
     }
     util.inherits(CodeNode, Node);
-    CodeNode.prototype.type = 'code';
-    CodeNode.prototype.func = null;
-    CodeNode.prototype.p = [];
 
     Message = function(doc) {
         Message.super_.call(this, doc);
@@ -191,7 +190,8 @@ module.exports = function(db, collectionName) {
             return runCodeNode(node, message, avatar)
         }
 
-        console.log('unknown node type')
+        console.log('unknown node type. node:');
+        console.log(node);
         return message;
     }
     var runCodeNode = function(node, message, avatar) {

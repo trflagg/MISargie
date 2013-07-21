@@ -173,6 +173,21 @@ module.exports = function(db, collectionName) {
                 newNode.nextSibling = createNode(lines);
                 break;
 
+            // removeMessage(messageText)
+            case 'removeMessage':
+                newNode.func = "removeMessage";
+                if (params.length < 1) {
+                    console.log("error: removeMessage needs 1 param.");
+                    return null;
+                }
+                newNode.p = [];
+                newNode.p[0] = params[0].trim();
+                newNode.nextSibling = createNode(lines);
+                break;
+
+            default:
+                console.log("can't compile unknown code node func: "+ func+"\nForgot a line return?");
+
         }
 
         return newNode
@@ -226,9 +241,14 @@ module.exports = function(db, collectionName) {
                 avatar.addMessage(node.p[0], node.p[1], node.p[2]);
                 return runNode(node.nextSibling, message, avatar);
                 break;
+
+            case 'removeMessage':
+                avatar.removeMessage(node.p[0]);
+                return runNode(node.nextSibling, message, avatar);
+                break;
         }
 
-        console.log("unknown code node func");
+        console.log("can't run unknown code node func: "+ node.func);
         return message;
 
     }

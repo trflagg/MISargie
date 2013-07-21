@@ -73,6 +73,16 @@ module.exports = function(db, callback) {
 
             function(callback) {
                 var m1 = db.create('Message');
+                m1.setName('G2_GRANT_ACCESS');
+                m1.setText('Thank you for your help. \n \
+                    {% setGlobal(level, 2) %} \n \
+                    {% removeMessage(Red Alert) %}');
+                m1.compile();
+                db.save('Message', m1, function(err) { callback(err) });
+            },
+
+            function(callback) {
+                var m1 = db.create('Message');
                 m1.setName('G2_READ_ALERT');
                 m1.setText('The ships reverses thrust and comes to a complete halt. It hails you. \n \
                     {% addMessage(Respond to hail, G2_RESPOND) %} \n \

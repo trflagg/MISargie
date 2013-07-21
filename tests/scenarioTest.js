@@ -33,9 +33,20 @@ module.exports = function(db, callback) {
         },
         function(picard, result, callback) {
             assert.equal(result, 'This is captain Tolares. We have a medical emergency on our ship, we are requesting immediate emergency access.\n');
-            // make sure message is deleted
+            // make sure message just ran is deleted
             assert.equal(picard.message('Hail Ship'), null);
-            callback(null);
+            // make sure message is added
+            assert.notEqual(picard.message('Grant Access'), null);
+            assert.notEqual(picard.message('Red Alert'), null);
+
+            // user grants access.
+            picard.runMessage('Grant Access', function(err, result) {
+                assert.equal(result, 'Thank you for your help.\n');
+                assert.equal(picard.getGlobal('level'), 2);
+                // make sure red alert option is removed
+                assert.equal(picard.message('Red Alert'), null);
+                callback(null);
+            })
         }
 
     ],

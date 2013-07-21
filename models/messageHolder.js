@@ -57,7 +57,17 @@ module.exports = function(db, collectionName) {
         }
     };
     MessageHolder.prototype.removeMessage = function(commandText) {
-        delete this._messages[commandText];
+        if (this._messages.hasOwnProperty(commandText)) {
+            delete this._messages[commandText];
+        }
+        else {
+            // message not here, look in children
+            for (var childName in this._children) {
+                if (this._children.hasOwnProperty(childName)) {
+                    this._children[childName].removeMessage(commandText);
+                }
+            }
+        }
     };
     MessageHolder.prototype.message = function(commandText) {
         return this._messages[commandText];
@@ -69,13 +79,13 @@ module.exports = function(db, collectionName) {
         return Object.keys(this._messages);
     };
 
-    MessageHolder.prototype.runMessage = function(commandText, avatar, callback) {
-        var messageName = this._messages[commandText];
-        if (!messageName) {
-            return callback("Message with commandText "+commandText+ " not found.");
-        }
-        return callback(null);
-    };
+    // MessageHolder.prototype.runMessage = function(commandText, avatar, callback) {
+    //     var messageName = this._messages[commandText];
+    //     if (!messageName) {
+    //         return callback("Message with commandText "+commandText+ " not found.");
+    //     }
+    //     return callback(null);
+    // };
 
     MessageHolder.prototype.toObject = function() {
         var messages = this._messages,

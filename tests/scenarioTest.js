@@ -18,25 +18,23 @@ module.exports = function(db, callback) {
                 // load first message
                 db.load('Message', {name: 'G2_INIT'}, function(err, message) {
                     assert.equal(err, null, err);
-
                     var result = message.run(picard);
                     assert.equal(picard.getGlobal('level'), 1);
                     assert.equal(result, 'A suspicious ship approaches.\n');
                     assert.equal(picard.getCommandTextList()[0], 'Hail Ship');
                     assert.equal(picard.getCommandTextList()[1], 'Red Alert');
 
-                    // user decides to hail
-                    var hailMessage = picard.message('Hail Ship');
-                    db.load('Message', {name: hailMessage}, function(err, message) {
-                        callback(err, picard, message);
+                    // user decides to hail. run message
+                    picard.runMessage('Hail Ship', function(err, result) {
+                        callback(err, picard, result);
                     });
                 });
             });
         },
-        function(picard, message, callback) {
-            var result = message.run(picard);
+        function(picard, result, callback) {
             assert.equal(result, 'This is captain Tolares. We have a medical emergency on our ship, we are requesting immediate emergency access.\n');
-            console.log(picard);
+            // make sure message is deleted
+            assert.equal(picard.message('Hail Ship'), null);
             callback(null);
         }
 

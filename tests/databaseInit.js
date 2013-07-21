@@ -58,6 +58,7 @@ module.exports = function(db, callback) {
                     {% addMessage(Hail Ship, G2_HAIL) %} \n \
                     {% addMessage(Red Alert, G2_RED_ALERT) %}');
                 m1.compile();
+
                 db.save('Message', m1, function(err) { callback(err) });
             },
 

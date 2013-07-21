@@ -31,12 +31,14 @@ module.exports = function(db, collectionName) {
             this._name = doc.name;
             this._text = doc.text;
             this._compiled = doc.compiled;
+            this._autoRemove = doc.autoRemove;
         }
         else {
             // make new Message
             this._name = null;
             this._text = null;
             this._compiled = {};
+            this._autoRemove = true;
         }
     }
     util.inherits(Message, Model);
@@ -47,15 +49,23 @@ module.exports = function(db, collectionName) {
             throw 'Message save validation failed: name required.';
         }
 
+
         var doc = Message.super_.prototype.onSave(message);
 
         doc.name = message._name;
         doc.text = message._text;
         doc.compiled = message._compiled;
+        doc.autoRemove = message.autoRemove();
 
         return doc;
     };
 
+    Message.prototype.setAutoRemove = function(bool) {
+        this._autoRemove = bool;
+    }
+    Message.prototype.autoRemove = function() {
+        return this._autoRemove;
+    }
 
     Message.prototype.setName = function(name) {
         this._name = name;

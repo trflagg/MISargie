@@ -79,13 +79,14 @@ module.exports = function(db, collectionName) {
         return Object.keys(this._messages);
     };
 
-    // MessageHolder.prototype.runMessage = function(commandText, avatar, callback) {
-    //     var messageName = this._messages[commandText];
-    //     if (!messageName) {
-    //         return callback("Message with commandText "+commandText+ " not found.");
-    //     }
-    //     return callback(null);
-    // };
+    MessageHolder.prototype.clear = function() {
+        this._messages = {};
+        for (var childName in this._children) {
+            if (this._children.hasOwnProperty(childName)) {
+                this._children[childName].clear();
+            }
+        }
+    }
 
     MessageHolder.prototype.toObject = function() {
         var messages = this._messages,

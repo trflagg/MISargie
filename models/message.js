@@ -27,6 +27,10 @@ module.exports = function(db, collectionName) {
         Message.super_.call(this, doc);
 
         if (doc !== undefined) {
+
+            if (doc === null) {
+                throw 'Message load error. doc not found';
+            }
             // load from doc
             this._name = doc.name;
             this._text = doc.text;

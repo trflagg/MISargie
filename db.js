@@ -48,8 +48,12 @@ module.exports = function(environment) {
             if (error) {
                 return callback(error, null);
             }
-
-            return callback(null, new db._models[modelName](result));
+            try {
+                var model = new db._models[modelName](result);
+            } catch(e) {
+                return callback(e.toString(), null);
+            }
+            return callback(null, model);
         });
     };
 

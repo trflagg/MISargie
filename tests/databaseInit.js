@@ -83,11 +83,12 @@ module.exports = function(db, callback) {
 
             function(callback) {
                 var m1 = db.create('Message');
-                m1.setName('G2_READ_ALERT');
+                m1.setName('G2_RED_ALERT');
                 m1.setText('The ships reverses thrust and comes to a complete halt. It hails you. \n \
                     {% addMessage(Respond to hail, G2_RESPOND) %} \n \
                     {% addMessage(Shields up, G2_SHIELDS_UP, ship.shields) %} \n \
-                    {% addMessage(Ready weaponse, G2_READY_WEAPONS, ship.weapons) %}');
+                    {% addMessage(Ready weapons, G2_READY_WEAPONS, ship.weapons) %} \n \
+                    {% removeMessage(Hail Ship) %}');
                 m1.compile();
                 db.save('Message', m1, function(err) {
                     console.log("created scenario."); 

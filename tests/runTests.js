@@ -4,7 +4,7 @@
 module.exports.runTests = function() {
     var assert = require('assert'),
          async = require('async'),
-         Db = require('../db')();
+         Db = require('../db');
 
 
     console.log('\n________ Running All Tests ____________');

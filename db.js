@@ -31,12 +31,22 @@ module.exports = function() {
                 return callback(e.toString(), null);
             }
         }
-        // save to db
-        this._db.collection(this.getCollectionName(modelName)).save(
-            model,
-            {upsert: true},
-            callback
-        );
+
+        if (callback) {
+            // save to db
+            this._db.collection(this.getCollectionName(modelName)).save(
+                model,
+                {upsert: true},
+                callback
+            );
+        }
+        else {
+            // save to db
+            this._db.collection(this.getCollectionName(modelName)).save(
+                model,
+                {upsert: true, w:0}
+            );
+        }
     };
 
     Db.prototype.load = function(modelName, condition, callback) {
@@ -62,4 +72,4 @@ module.exports = function() {
     };
 
     return Db;
-}
+}()

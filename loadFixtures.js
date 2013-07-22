@@ -43,7 +43,9 @@ module.exports = function() {
                 if (err) {
                     console.log(err);
                 }
-                fileEmitter.emit('fileLoaded', data, filename, fileCount);
+                //remove extension
+                var filenameParse = /(\w+)\.\w+/.exec(filename)
+                fileEmitter.emit('fileLoaded', data, filenameParse[1], fileCount);
             })
         }
 

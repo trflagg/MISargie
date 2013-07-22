@@ -34,12 +34,12 @@ module.exports = function() {
     db.deleteAll('Message');
 
     // load all files in directory and emit event.
-    fs.readdir('./frameworks', function (err, files) {
+    fs.readdir('./fixtures', function (err, files) {
         var fileCount = files.length;
 
         for (var i=0; i<fileCount; i++) {
             var filename = files[i];
-            fs.readFile('./frameworks/' + files[i], 'utf8', function(err, data) {
+            fs.readFile('./fixtures/' + files[i], 'utf8', function(err, data) {
                 if (err) {
                     console.log(err);
                 }

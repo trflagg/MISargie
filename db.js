@@ -71,5 +71,9 @@ module.exports = function() {
         return modelName.toLowerCase();
     };
 
+    Db.prototype.deleteAll = function(modelName) {
+        this._db.collection(this.getCollectionName(modelName)).drop();
+    }
+
     return Db;
 }()

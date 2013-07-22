@@ -16,7 +16,7 @@ module.exports = function(db, callback) {
             
             // make avatar
             function(callback) {
-                db._db.collection('avatar').drop();
+                db.deleteAll('Avatar');
                 db._db.collection('avatar').insert({
                     name: 'Taylor'
                 }, function(err, result) {
@@ -27,7 +27,7 @@ module.exports = function(db, callback) {
 
             // make message
             function(callback) {
-                db._db.collection('message').drop();
+                db.deleteAll('Message');
                 db._db.collection('message').insert({
                     name: 'G1_RED_ALERT',
                     text: 'Red Alert!\n{% setGlobal(red_alert,1) %}\n Battlestations!'

@@ -28,7 +28,12 @@ module.exports = function() {
             try {
                 model = this._models[modelName].prototype.onSave(model);
             } catch(e) {
-                return callback(e.toString(), null);
+                if (callback) {
+                    return callback(e.toString(), null);
+                }
+                else {
+                    throw e;
+                }
             }
         }
 

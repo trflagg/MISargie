@@ -10,44 +10,24 @@ module.exports = function() {
         fileEmitter = new EventEmitter(),
         messageList = [];
 
-    // for every file found we run this
-    fileEmitter.on('fileLoaded', function(data, filename, fileCount) {
-        console.log('file: ' + filename);
-        console.log(data);
-
-        var newMessage = db.create('Message');
-        newMessage.setName(filename);
-        newMessage.setText(data);
-        newMessage.compile();
-        db.save('Message', newMessage);
-        console.log('saved ----------------------');
-
-        messageList.push(newMessage);
-        if (messageList.length == fileCount) {
-            // done.
-            console.log('goodbye');
-            db.close();
-        }
-    });
-
     // remove all to begin
     db.deleteAll('Message');
 
     // load all files in directory and emit event.
-    fs.readdir('./fixtures', function (err, files) {
-        var fileCount = files.length;
+    fs.readdirSync('./fixtures').forEach(function(file) {
+        console.log(file);
+        var data = fs.readFileSync('./fixtures/' + file, {encoding: 'utf8'})
+        var filenameParse = /(\w+)\.\w+/.exec(file);
+        console.log(data);
 
-        for (var i=0; i<fileCount; i++) {
-            var filename = files[i];
-            fs.readFile('./fixtures/' + files[i], 'utf8', function(err, data) {
-                if (err) {
-                    console.log(err);
-                }
-                //remove extension
-                var filenameParse = /(\w+)\.\w+/.exec(filename)
-                fileEmitter.emit('fileLoaded', data, filenameParse[1], fileCount);
-            })
-        }
-
+        var newMessage = db.create('Message');
+        newMessage.setName(filenameParse);
+        newMessage.setText(data);
+        newMessage.compile();
+        db.save('Message', newMessage);
+        console.log('saved ----------------------');
     });
+    // done.
+    console.log('goodbye');
+    db.close();
 }();

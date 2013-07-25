@@ -1,0 +1,2 @@
+{% removeMessage(On screen) %}
+The vessel is a small diplomatic cruiser with the purple markings of the Arthurians.

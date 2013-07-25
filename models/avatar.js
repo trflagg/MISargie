@@ -57,7 +57,6 @@ module.exports = function(db, collectionName) {
         var messageName = this.message(commandText);
         //callback variable
         var avatar = this;
-
         db.load('Message', {name: messageName}, function(err, message) {
             if (err) {
                 return callback(err, null);

@@ -18,15 +18,16 @@ module.exports = function(db, callback) {
                 // load first message
                 db.load('Message', {name: 'G2_INIT'}, function(err, message) {
                     assert.equal(err, null, err);
-                    var result = message.run(picard);
-                    assert.equal(picard.getGlobal('level'), 1);
-                    assert.equal(result, 'A suspicious ship approaches.\n');
-                    assert.equal(picard.getCommandTextList()[0], 'Hail Ship');
-                    assert.equal(picard.getCommandTextList()[1], 'Red Alert');
+                    message.run(picard, function(err, result) {
+                        assert.equal(picard.getGlobal('level'), 1);
+                        assert.equal(result, 'A suspicious ship approaches.\n');
+                        assert.equal(picard.getCommandTextList()[0], 'Hail Ship');
+                        assert.equal(picard.getCommandTextList()[1], 'Red Alert');
 
-                    // user decides to hail. run message
-                    picard.runMessage('Hail Ship', function(err, result) {
-                        callback(err, picard, result);
+                        // user decides to hail. run message
+                        picard.runMessage('Hail Ship', function(err, result) {
+                            callback(err, picard, result);
+                        });
                     });
                 });
             });
@@ -58,15 +59,16 @@ module.exports = function(db, callback) {
             // load first message
             db.load('Message', {name: 'G2_INIT'}, function(err, message) {
                 assert.equal(err, null, err);
-                var result = message.run(picard);
-                assert.equal(result, 'A suspicious ship approaches.\n');
-                assert.equal(picard.getCommandTextList()[0], 'Hail Ship');
-                assert.equal(picard.getCommandTextList()[1], 'Red Alert');
+                message.run(picard, function(err, result) {
+                    assert.equal(result, 'A suspicious ship approaches.\n');
+                    assert.equal(picard.getCommandTextList()[0], 'Hail Ship');
+                    assert.equal(picard.getCommandTextList()[1], 'Red Alert');
 
-                // user decides to go on red alert.
-                picard.runMessage('Red Alert', function(err, result) {
-                    assert.equal(err, null, err);
-                    callback(err, picard, result);
+                    // user decides to go on red alert.
+                    picard.runMessage('Red Alert', function(err, result) {
+                        assert.equal(err, null, err);
+                        callback(err, picard, result);
+                    });
                 });
             });
         },
@@ -75,7 +77,18 @@ module.exports = function(db, callback) {
             assert.equal(result, 'The ships reverses thrust and comes to a complete halt. It hails you.\n');
             assert.equal(picard.getCommandTextList()[0], 'Respond to hail');
             assert.equal(picard.child('ship').child('weapons').getCommandTextList()[0], 'Ready weapons');
-            assert.equal(picard.child('ship').child('shields').getCommandTextList()[0], 'Shields up');
+            assert.equal(picard.getCommandTextList()[1], 'Shields up');
+
+            // user responds shields up
+            picard.runMessage('Shields up', function(err, result) {
+                assert.equal(err, null, err);
+                callback(err, picard, result);
+            });
+        },
+
+        function(picard, result, callback) {
+            assert.equal(result, 'Alarms go off signaling that the enemy vessel has readied its weapons.\n');
+            assert.equal(picard.getGlobal('response'), 1);
             callback(null);
         }
 

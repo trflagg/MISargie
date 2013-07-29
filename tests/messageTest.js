@@ -41,11 +41,13 @@ module.exports = function(db, callback) {
         // run message on an avatar.
         function(message, callback) {
             db.load('Avatar', {name: 'Joe'}, function(err, avatar) {
-                var msg = message.run(avatar);
-                console.log(msg);
-                assert.equal(msg, 'Red Alert!\nBattlestations!\n');
-                assert.equal(avatar.getGlobal('red_alert'),1);
-                callback(err, avatar);
+                message.run(avatar, function(err, result) {
+                    console.log(result);
+                    // console.log(err);
+                    assert.equal(result, 'Red Alert!\nBattlestations!\n');
+                    assert.equal(avatar.getGlobal('red_alert'),1);
+                    callback(err, avatar);
+                });
             });
         },
 

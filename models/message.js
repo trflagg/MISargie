@@ -1,27 +1,11 @@
 module.exports = function(db, collectionName) {
     var util = require('util'),
+        async = require('async'),
+        codeHandler = require('./codeHandler'),
         Model = require('./Model')(db),
+        Nodes = require('./Nodes'),
         collectionName = collectionName || 'messages';
 
-    Node = function() {
-        this.type ='node';
-        this,nextSibling = { };
-    }
-
-    var TextNode = function() {
-        TextNode.super_.call(this);
-        this.type = 'text';
-        this.text = '';
-    }
-    util.inherits(TextNode, Node);
-
-    var CodeNode = function() {
-        CodeNode.super_.call(this);
-        this.type = 'code';
-        this.func = null;
-        this.p = [];
-    }
-    util.inherits(CodeNode, Node);
 
     Message = function(doc) {
         Message.super_.call(this, doc);
@@ -36,6 +20,8 @@ module.exports = function(db, collectionName) {
             this._text = doc.text;
             this._compiled = doc.compiled;
             this._autoRemove = doc.autoRemove;
+            this._messagesLoaded = doc.messagesLoaded;
+            this._globalsRequested = doc.globalsRequested;
         }
         else {
             // make new Message
@@ -43,6 +29,8 @@ module.exports = function(db, collectionName) {
             this._text = null;
             this._compiled = {};
             this._autoRemove = true;
+            this._messagesLoaded = [];
+            this._globalsRequested = [];
         }
     }
     util.inherits(Message, Model);
@@ -60,6 +48,8 @@ module.exports = function(db, collectionName) {
         doc.text = message._text;
         doc.compiled = message._compiled;
         doc.autoRemove = message.autoRemove();
+        doc.messagesLoaded = message._messagesLoaded;
+        doc.globalsRequested = message._globalsRequested;
 
         return doc;
     };
@@ -85,6 +75,13 @@ module.exports = function(db, collectionName) {
         return this._text;
     }
 
+    Message.prototype.messagesLoaded = function() {
+        return this._messagesLoaded;
+    }
+    Message.prototype.globalsRequested = function() {
+        return this._globalsRequested;
+    }
+
     Message.prototype.getCompiled = function() {
         return this._compiled;
     }
@@ -94,16 +91,14 @@ module.exports = function(db, collectionName) {
             return null;
         }
 
-        var firstNode = createNode(this._text.split('\n'));
-        
+        var firstNode = createNode(this._text.split('\n'), this);
         this._compiled = firstNode;
         return firstNode;
     }
-    var createNode = function(lines) {
+    var createNode = function(lines, message) {
         var newNode = null;
         var currentLine = null;
 
-        // console.log(lines)
         if (lines.length == 0) {
             // console.log('lines empty, bubbling up');
             return null;
@@ -112,17 +107,17 @@ module.exports = function(db, collectionName) {
         currentLine = lines.shift().trim();
 
         if (currentLine.indexOf("{%") == 0) {
-            newNode = createCodeNode(currentLine, lines)
+            newNode = createCodeNode(currentLine, lines, message)
         } else {
-            newNode = new TextNode();
+            newNode = new Nodes.TextNode();
             newNode.text = currentLine;
             // console.log('text node created:'+newNode.text);
-            newNode.nextSibling = createNode(lines);
+            newNode.nextSibling = createNode(lines, message);
         }
 
         return newNode;
     }
-    var createCodeNode = function(currentLine, lines) {
+    var createCodeNode = function(currentLine, lines, message) {
         var newNode = null;
         var removeBrackets = /{%(.*)%}/;  // everything between {% and %}
         var getFunctionAndParameters = /^(.+)\((.*)\)$/;  // funcName(params)
@@ -130,130 +125,68 @@ module.exports = function(db, collectionName) {
         var func = getFunctionAndParameters.exec(code)[1];
         var params = getFunctionAndParameters.exec(code)[2].split(",");
 
-        newNode = new CodeNode();
+        newNode = codeHandler.createCodeNode(func, params, message);
 
-        switch(func) {
-
-            // setGlobal(globalName, value)
-            case 'setGlobal':
-                newNode.func = "setGlobal";
-                if (params.length < 2) {
-                    console.log("error: setGlobal needs 2 params");
-                    return null;
-                }
-                newNode.p = [];
-                newNode.p[0] = params[0].trim();
-                newNode.p[1] = params[1].trim();
-                // console.log('setGlobal code node created.');
-                newNode.nextSibling = createNode(lines);
-                break;
-
-            // getGlobal(globalName)
-            case 'getGlobal':
-                newNode.func = "getGlobal";
-                if (params.length < 1) {
-                    console.log("error: getGlobal needs 1 param.");
-                    return null;
-                }
-                newNode.p = [];
-                newNode.p[0] = params[0].trim();
-                newNode.nextSibling = createNode(lines);
-                break;
-
-            // addMessage(messageText, messageName, [child])
-            case 'addMessage':
-                newNode.func = "addMessage";
-                if (params.length < 2) {
-                    console.log("error: addMessage needs at least 2 params.");
-                    return null;
-                }
-                newNode.p = [];
-                newNode.p[0] = params[0].trim();
-                newNode.p[1] = params[1].trim();
-                newNode.p[2] = null;
-                if (params[2]) {
-                    newNode.p[2] = params[2];
-                }
-                newNode.nextSibling = createNode(lines);
-                break;
-
-            // removeMessage(messageText)
-            case 'removeMessage':
-                newNode.func = "removeMessage";
-                if (params.length < 1) {
-                    console.log("error: removeMessage needs 1 param.");
-                    return null;
-                }
-                newNode.p = [];
-                newNode.p[0] = params[0].trim();
-                newNode.nextSibling = createNode(lines);
-                break;
-
-            default:
-                console.log("can't compile unknown code node func: "+ func+"\nForgot a line return?");
-
+        if (newNode === null) {
+            console.log("can't compile unknown code node func: "+ func+"\nForgot a line return?");
         }
 
+        // recursively add sibling
+        newNode.nextSibling = createNode(lines, message);
         return newNode
     };
 
 
-    Message.prototype.run = function(avatar) {
+    Message.prototype.run = function(avatar, callback) {
         if (this._compiled === null) {
-            return null;
+            this.compile();
         }
 
-        var message = ''
-        return runNode(this._compiled, message, avatar);
+        // load any messages
+        var messagesLoaded = this.messagesLoaded();
+        if (messagesLoaded.length > 0) {
+            // callback variable
+            var originalMessage = this;
+
+            db.loadMultiple('Message', {name: { $in: messagesLoaded}}, function(err, messages) {
+                if (err) {
+                    console.log(err);
+                    return callback(err, '');
+                }
+                var msgObject = {};
+                for(var i=0, ll=messages.length; i<ll; i++) {
+                    msgObject[messages[i].getName()] = messages[i];
+                }
+                avatar.loadedMessages = msgObject;
+                // kick it off
+                runNode(originalMessage._compiled, '', avatar, callback);
+            });
+        }
+        else {
+            // kick it off
+            runNode(this._compiled, '', avatar, callback);
+        }
     };
-    var runNode = function(node, message, avatar) {
+    var runNode = function(node, result, avatar, callback) {
         if (node === null) {
-            return message;
+            return callback(null, result);
         }
-
         if (node.type == 'text') {
-            message = message.concat(node.text, '\n');
-            return runNode(node.nextSibling, message, avatar);
+            result = result.concat(node.text, '\n');
+            runNode(node.nextSibling, result, avatar, callback);
         }
         else if(node.type == 'code') {
-            return runCodeNode(node, message, avatar)
+            runCodeNode(node, result, avatar, callback);
         }
 
-        console.log('unknown node type. node:');
-        console.log(node);
-        return message;
     }
-    var runCodeNode = function(node, message, avatar) {
-        if (node === null) {
-            return message;
-        }
+    var runCodeNode = function(node, result, avatar, callback) {
 
-        switch(node.func) {
-            case 'setGlobal':
-                avatar.setGlobal(node.p[0], node.p[1])
-                return runNode(node.nextSibling, message, avatar);
-                break;
+        codeHandler.runFunction(node, result, avatar, function(err, result, avatar) {
+            
+            runNode(node.nextSibling, result, avatar, callback);
 
-            case 'getGlobal':
-                if (avatar.getGlobal(node.p[0])) {
-                    message = message.concat(node.p[0]);
-                }
-                return runNode(node.nextSibling, message, avatar);
-                break;
-
-            case 'addMessage':
-                avatar.addMessage(node.p[0], node.p[1], node.p[2]);
-                return runNode(node.nextSibling, message, avatar);
-                break;
-
-            case 'removeMessage':
-                avatar.removeMessage(node.p[0]);
-                return runNode(node.nextSibling, message, avatar);
-                break;
-        }
-
-        console.log("can't run unknown code node func: "+ node.func);
-        return message;
+        })
 
     }
 

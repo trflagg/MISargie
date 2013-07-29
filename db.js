@@ -72,6 +72,30 @@ module.exports = function() {
         });
     };
 
+    Db.prototype.loadMultiple = function(modelName, condition, callback) {
+        // callback variable
+        var db = this;
+
+        // load from db
+        
+        this._db.collection(this.getCollectionName(modelName)).find(condition).toArray(function(err, results) {
+            if (err) {
+                return callback(err, null);
+            }
+            var objects = [];
+
+            try {
+                for (var i=0, ll=results.length; i<ll; i++) {
+                    objects.push(new db._models[modelName](results[i]));
+                }
+            } catch(e) {
+                return callback(e.toString(), null);
+            }
+
+            return callback(null, objects);
+        });
+    };
+
     Db.prototype.getCollectionName = function(modelName) {
         return modelName.toLowerCase();
     };

@@ -64,8 +64,7 @@ module.exports = function(db, collectionName) {
             if (message.autoRemove()) {
                 avatar.removeMessage(commandText)
             }
-            var result = message.run(avatar);
-            callback(null, result);
+            var result = message.run(avatar, callback);
         });
 
     };

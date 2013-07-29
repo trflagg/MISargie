@@ -89,7 +89,6 @@ function promptForCommands(avatar) {
             else {
                 // run message, show result, ask for next command
                 console.log(a);
-                console.log(avatar.getCommandTextList());
                 var result = avatar.runMessage(avatar.getCommandTextList()[a], function(err, result) {
                     if (err) {
                         console.log(err);

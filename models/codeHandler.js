@@ -10,6 +10,64 @@ module.exports = function() {
     CodeHandler.prototype.registerFunction = function(functionName, functionObject) {
         this._functions[functionName] = functionObject;
     };
+
+    CodeHandler.prototype.createNode = function(lines, message) {
+        var newNode = null;
+        var currentLine = null;
+
+        if (lines.length == 0) {
+            // console.log('lines empty, bubbling up');
+            return null;
+        }
+
+        currentLine = lines.shift().trim();
+
+        if (currentLine.indexOf("{%") == 0) {
+            newNode = this.createCodeNode(currentLine, lines, message);
+        } else {
+            newNode = this.createTextNode(currentLine);
+        }
+
+        newNode.nextSibling = this.createNode(lines, message);
+
+        return newNode;
+    }
+
+    CodeHandler.prototype.createTextNode = function(currentLine) {
+        newNode = new Nodes.TextNode();
+        newNode.text = currentLine;
+
+        return newNode;
+    }
+
+    CodeHandler.prototype.createCodeNode = function(currentLine, lines, message) {
+        var func = this.parseFunction(currentLine);
+
+        var newNode = null;
+
+        if (this._functions.hasOwnProperty(func.functionName)) {
+            newNode = this._functions[func.functionName].createCodeNode(func.params, message, lines);
+        }
+        else {
+            console.log("can't compile unknown code node func: "+ func+"\nForgot a line return?");
+            newNode = null;
+        }
+
+        return newNode;
+    };
+
+    CodeHandler.prototype.parseFunction = function(currentLine) {
+        var removeBrackets = /{%(.*)%}/;  // everything between {% and %}
+        var getFunctionAndParameters = /^(.+)\((.*)\)$/;  // funcName(params)
+        var code = removeBrackets.exec(currentLine)[1].trim();
+        var func = getFunctionAndParameters.exec(code)[1];
+        var params = getFunctionAndParameters.exec(code)[2].split(",");
+        return {
+            functionName: func,
+            params: params
+        };
+    }
+
     CodeHandler.prototype.runFunction = function(node, result, avatar, callback) {
         var functionName = node.func;
 
@@ -20,15 +78,6 @@ module.exports = function() {
             callback("Function "+ functionName + " not found.", result, avatar);
         }
     };
-    CodeHandler.prototype.createCodeNode = function(functionName, params, message) {
-        if (this._functions.hasOwnProperty(functionName)) {
-            return this._functions[functionName].createCodeNode(params, message);
-        }
-        else {
-            return null;
-        }
-
-    };
     var codeHandler = new CodeHandler();
 
 
@@ -36,7 +85,7 @@ module.exports = function() {
         this.name = 'functionObject';
         this.minParams = 0;
     };
-    FunctionObject.prototype.createCodeNode = function(params, message) {
+    FunctionObject.prototype.createCodeNode = function(params, message, lines) {
         return new Nodes.CodeNode();
     };
     FunctionObject.prototype.run = function(node, result, avatar, callback) {
@@ -88,7 +137,7 @@ module.exports = function() {
         this.minParams = 2;
     }
     util.inherits(SetGlobal, FunctionObject);
-    
+
     SetGlobal.prototype.createCodeNode = function(params, message) {
         this.checkParams(params);
 
@@ -114,7 +163,7 @@ module.exports = function() {
         this.minParams = 2;
     }
     util.inherits(AddMessage, FunctionObject);
-    
+
     AddMessage.prototype.createCodeNode = function(params, message) {
         this.checkParams(params);
 
@@ -146,7 +195,7 @@ module.exports = function() {
         this.minParams = 1;
     }
     util.inherits(RemoveMessage, FunctionObject);
-    
+
     RemoveMessage.prototype.createCodeNode = function(params, message) {
         this.checkParams(params);
 
@@ -171,7 +220,7 @@ module.exports = function() {
         this.minParams = 1;
     }
     util.inherits(LoadMessage, FunctionObject);
-    
+
     LoadMessage.prototype.createCodeNode = function(params, message) {
         this.checkParams(params);
 
@@ -197,5 +246,50 @@ module.exports = function() {
     };
     codeHandler.registerFunction('loadMessage', new LoadMessage());
 
-    return codeHandler; 
+
+
+    var IfGlobal = function() {
+        IfGlobal.super_.call(this);
+        this.name = 'ifGlobal';
+        this.minParams = 3;
+    }
+    util.inherits(IfGlobal, FunctionObject);
+
+    IfGlobal.prototype.createCodeNode = function(params, message, lines) {
+        this.checkParams(params);
+
+        newNode = new Nodes.IfNode();
+        newNode.func = 'ifGlobal';
+        this.copyParams(params, newNode.p);
+        message.globalsRequested().push(params[0].trim());
+
+        // look for end of block
+        var blockLines = [],
+            currentLine = null,
+            inElse = false;
+
+        while(true) {
+            if (lines.length == 0) {
+                throw "Hit end of lines while looking for end of if block. {% endif %} or {% else %} not found."
+            }
+
+            currentLine = lines.shift().trim();
+            if (currentLine.trim() == '{% endif %}') {
+                // finish up
+                var blockNode = this.createNode()
+            }
+        }
+
+        return newNode;
+    }
+
+    IfGlobal.prototype.run = function(node, result, avatar, callback) {
+        // ifGlobal(globalName, comparison, value)
+        var global = avatar.getGlobal(node.p[0]);
+
+    }
+    codeHandler.registerFunction('ifGlobal', new IfGlobal());
+
+
+    return codeHandler;
 }()

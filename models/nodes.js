@@ -22,5 +22,12 @@ module.exports = function() {
     };
     util.inherits(exports.CodeNode, exports.Node);
 
+    exports.IfNode = function() {
+        exports.IfNode.super_.call(this);
+        this.trueBlock = null;
+        this.elseBlock = null;
+    };
+    util.inherits(exports.IfNode, exports.CodeNode);
+
     return exports;
 }();

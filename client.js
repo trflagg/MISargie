@@ -59,14 +59,16 @@ function startLoop(avatar) {
 
 function doLoop(avatar, message) {
     if (message) {
-        var result = message.run(avatar);
+        var result = message.run(avatar, function(err, result) {
+            
+            // show result of message
+            console.log(result);
+
+            //show command options
+            promptForCommands(avatar);
+        });
     }
 
-    // show result of message
-    console.log(result);
-
-    //show command options
-    promptForCommands(avatar);
 }
 
 function promptForCommands(avatar) {

@@ -91,50 +91,10 @@ module.exports = function(db, collectionName) {
             return null;
         }
 
-        var firstNode = createNode(this._text.split('\n'), this);
+        var firstNode = codeHandler.createNode(this._text.split('\n'), this);
         this._compiled = firstNode;
         return firstNode;
     }
-    var createNode = function(lines, message) {
-        var newNode = null;
-        var currentLine = null;
-
-        if (lines.length == 0) {
-            // console.log('lines empty, bubbling up');
-            return null;
-        }
-
-        currentLine = lines.shift().trim();
-
-        if (currentLine.indexOf("{%") == 0) {
-            newNode = createCodeNode(currentLine, lines, message)
-        } else {
-            newNode = new Nodes.TextNode();
-            newNode.text = currentLine;
-            // console.log('text node created:'+newNode.text);
-            newNode.nextSibling = createNode(lines, message);
-        }
-
-        return newNode;
-    }
-    var createCodeNode = function(currentLine, lines, message) {
-        var newNode = null;
-        var removeBrackets = /{%(.*)%}/;  // everything between {% and %}
-        var getFunctionAndParameters = /^(.+)\((.*)\)$/;  // funcName(params)
-        var code = removeBrackets.exec(currentLine)[1].trim();
-        var func = getFunctionAndParameters.exec(code)[1];
-        var params = getFunctionAndParameters.exec(code)[2].split(",");
-
-        newNode = codeHandler.createCodeNode(func, params, message);
-
-        if (newNode === null) {
-            console.log("can't compile unknown code node func: "+ func+"\nForgot a line return?");
-        }
-
-        // recursively add sibling
-        newNode.nextSibling = createNode(lines, message);
-        return newNode
-    };
 
 
     Message.prototype.run = function(avatar, callback) {

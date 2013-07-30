@@ -102,6 +102,7 @@ module.exports = function(db, collectionName) {
             this.compile();
         }
 
+            // console.log('Running: '+this.getName());
         // load any messages
         var messagesLoaded = this.messagesLoaded();
         if (messagesLoaded.length > 0) {
@@ -119,37 +120,14 @@ module.exports = function(db, collectionName) {
                 }
                 avatar.loadedMessages = msgObject;
                 // kick it off
-                runNode(originalMessage._compiled, '', avatar, callback);
+                codeHandler.runNode(originalMessage._compiled, '', avatar, callback);
             });
         }
         else {
             // kick it off
-            runNode(this._compiled, '', avatar, callback);
+            codeHandler.runNode(this._compiled, '', avatar, callback);
         }
     };
-    var runNode = function(node, result, avatar, callback) {
-        if (node === null) {
-            return callback(null, result);
-        }
-        if (node.type == 'text') {
-            result = result.concat(node.text, '\n');
-            runNode(node.nextSibling, result, avatar, callback);
-        }
-        else if(node.type == 'code') {
-            runCodeNode(node, result, avatar, callback);
-        }
-
-    }
-    var runCodeNode = function(node, result, avatar, callback) {
-
-        codeHandler.runFunction(node, result, avatar, function(err, result, avatar) {
-            
-            runNode(node.nextSibling, result, avatar, callback);
-
-        })
-
-    }
-
     db.register('Message', Message);
 
     return Message;

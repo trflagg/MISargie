@@ -132,7 +132,20 @@ module.exports = function(db, callback) {
             function(callback) {
                 var m1 = db.create('Message');
                 m1.setName('G2_SHIP_THREATENS');
-                m1.setText('Alarms go off signaling that the enemy vessel has readied its weapons.');
+                m1.setText('Alarms go off signaling that the enemy vessel has readied its weapons. \n \
+                    {% ifGlobal(response, eq, 1) %} \n \
+                    Lasers strike from the front of the enemy ship, but they disintegrate in the shield. \n \
+                    {% endif %} \n \
+                    {% ifGlobal(response, eq, 2) %} \n \
+                    Lasers strike from the front of the enemy ship. They create two large holes in your port engines. \n \
+                    {% addMessage(Fire weapons, G2_FIRE) %} \n \
+                    {% endif %} \n \
+                    {% ifGlobal(response, eq, 0) %} \n \
+                    The gargling noise transmitted from the enemy ship gets much louder. \n \
+                    Gargling voice: Do you surrender? \n \
+                    {% addMessage(Yes, G2_SURRENDER) %} \n \
+                    {% addMessage(No, G2_No_SURRENDER) %} \n \
+                    {% endif %} \n');
                 m1.compile();
                 db.save('Message', m1, function(err) {
                     console.log("created scenario."); 

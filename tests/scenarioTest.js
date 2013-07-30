@@ -87,7 +87,7 @@ module.exports = function(db, callback) {
         },
 
         function(picard, result, callback) {
-            assert.equal(result, 'Alarms go off signaling that the enemy vessel has readied its weapons.\n');
+            assert.equal(result, 'Alarms go off signaling that the enemy vessel has readied its weapons.\nLasers strike from the front of the enemy ship, but they disintegrate in the shield.\n\n');
             assert.equal(picard.getGlobal('response'), 1);
             callback(null);
         }

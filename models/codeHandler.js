@@ -68,6 +68,23 @@ module.exports = function() {
         };
     }
 
+
+    CodeHandler.prototype.runNode = function(node, result, avatar, callback) {
+        if (node === null) {
+            return callback(null, result, avatar);
+        }
+        if (node.type == 'text') {
+            result = result.concat(node.text, '\n');
+            this.runNode(node.nextSibling, result, avatar, callback);
+        }
+        else if(node.type == 'code') {
+            codeHandler.runFunction(node, result, avatar, function(err, result, avatar) {
+                codeHandler.runNode(node.nextSibling, result, avatar, callback);
+            })
+        }
+        
+
+    }
     CodeHandler.prototype.runFunction = function(node, result, avatar, callback) {
         var functionName = node.func;
 
@@ -258,7 +275,7 @@ module.exports = function() {
     IfGlobal.prototype.createCodeNode = function(params, message, lines) {
         this.checkParams(params);
 
-        newNode = new Nodes.IfNode();
+        var newNode = new Nodes.IfNode();
         newNode.func = 'ifGlobal';
         this.copyParams(params, newNode.p);
         message.globalsRequested().push(params[0].trim());
@@ -269,14 +286,29 @@ module.exports = function() {
             inElse = false;
 
         while(true) {
-            if (lines.length == 0) {
+            if (lines.length === 0) {
                 throw "Hit end of lines while looking for end of if block. {% endif %} or {% else %} not found."
             }
 
             currentLine = lines.shift().trim();
-            if (currentLine.trim() == '{% endif %}') {
-                // finish up
-                var blockNode = this.createNode()
+            if (currentLine.trim() === '{% endif %}') {
+                var blockNode = codeHandler.createNode(blockLines, message)
+                if (inElse) {
+                    newNode.elseBlock = blockNode;
+                    break;
+                }
+                else {
+                    newNode.trueBlock = blockNode;
+                    break;
+                }
+            } 
+            else if (currentLine.trim() === '{% else %}') {
+                var blockNode = codeHandler.createNode(blockLines, message)
+                newNode.trueBlock = blockNode;
+                inElse = true;
+            }
+            else {
+                blockLines.push(currentLine);
             }
         }
 
@@ -286,7 +318,23 @@ module.exports = function() {
     IfGlobal.prototype.run = function(node, result, avatar, callback) {
         // ifGlobal(globalName, comparison, value)
         var global = avatar.getGlobal(node.p[0]);
-
+        switch(node.p[1]) {
+            case 'eq':
+                if (global == node.p[2] && node.trueBlock) {
+                    codeHandler.runNode(node.trueBlock, result, avatar, callback);
+                }
+                else {
+                    if (node.elseBlock) {
+                        codeHandler.runNode(node.elseBlock, result, avatar, callback);
+                    }
+                    else {
+                        callback(null, result, avatar);
+                    }
+                }
+                break;
+            default:
+                callback("ifGlobal has unknown comparison", result, avatar);
+        }
     }
     codeHandler.registerFunction('ifGlobal', new IfGlobal());
 

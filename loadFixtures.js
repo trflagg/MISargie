@@ -4,7 +4,10 @@ var fs = require('fs'),
 
 // load all files in /frameworks as messages
 module.exports = function() {
-    var environment = require('./environments/environment-local'),
+
+    var env = process.argv[2] || './environments/environment-local'
+
+    var environment = require(env),
         db = new Db(environment),
         Message = require('./models/Message')(db),
         fileEmitter = new EventEmitter(),

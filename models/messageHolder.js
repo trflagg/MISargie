@@ -76,7 +76,24 @@ module.exports = function(db, collectionName) {
         return Object.keys(this._messages).length;
     };
     MessageHolder.prototype.getCommandTextList = function() {
-        return Object.keys(this._messages);
+        var list = [];
+        var keys = Object.keys(this._messages);
+        for (var i =0, ll=keys.length; i<ll; i++) {
+            var obj = {};
+            obj.text = keys[i];
+            list.push(obj);
+        }
+        var children = this._children;
+        for (var childName in children) {
+            if (children.hasOwnProperty(childName)) {
+                var obj = {}
+                obj.text = childName
+                obj.children = this._children[childName].getCommandTextList();
+
+                list.push(obj);
+            }
+        }
+        return list;
     };
 
     MessageHolder.prototype.clear = function() {

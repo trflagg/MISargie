@@ -16,9 +16,9 @@ module.exports = function(db, callback) {
             messageHolder.addMessage('Yellow Alert', 'G1_YELLOW_ALERT');
             messageHolder.addMessage('Green Alert', 'G1_GREEN_ALERT');
             assert.equal(messageHolder.messageCount(), 3);
-            assert.equal(messageHolder.getCommandTextList()[0], 'Red Alert');
-            assert.equal(messageHolder.getCommandTextList()[1], 'Yellow Alert');
-            assert.equal(messageHolder.getCommandTextList()[2], 'Green Alert');
+            assert.equal(messageHolder.getCommandTextList()[0].text, 'Red Alert');
+            assert.equal(messageHolder.getCommandTextList()[1].text, 'Yellow Alert');
+            assert.equal(messageHolder.getCommandTextList()[2].text, 'Green Alert');
 
             messageHolder.removeMessage('Yellow Alert');
             assert.equal(messageHolder.messageCount(), 2);

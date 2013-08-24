@@ -53,8 +53,8 @@ module.exports = function(db, collectionName) {
         return this._globals[key];
     };
 
-    Avatar.prototype.runMessage = function(commandText, callback) {
-        var messageName = this.message(commandText);
+    Avatar.prototype.runMessage = function(commandText, child, callback) {
+        var messageName = this.message(commandText, child);
         //callback variable
         var avatar = this;
         db.load('Message', {name: messageName}, function(err, message) {

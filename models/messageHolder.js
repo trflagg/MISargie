@@ -69,8 +69,16 @@ module.exports = function(db, collectionName) {
             }
         }
     };
-    MessageHolder.prototype.message = function(commandText) {
-        return this._messages[commandText];
+    MessageHolder.prototype.message = function(commandText, child) {
+        if (child) {
+            // childArray[1] = first item of dot-separated children
+            // childArray[2] = rest of the string (minus the dot)
+            var childArray = /(\w+)(?:\.([\w.]+))*/.exec(child);
+            return this.child(childArray[1]).message(commandText, childArray[2]);
+        }
+        else {
+            return this._messages[commandText];
+        }
     }
     MessageHolder.prototype.messageCount = function() {
         return Object.keys(this._messages).length;

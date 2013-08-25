@@ -56,13 +56,12 @@ module.exports = function(db, collectionName) {
             // childArray[1] = first item of dot-separated children
             // childArray[2] = rest of the string (minus the dot)
             var childArray = /(\w+)(?:\.([\w.]+))*/.exec(child);
-
             return this.child(childArray[1]).addMessage(commandText, messageName, childArray[2]);
         }
         else {
             this._messages[commandText] = messageName;   
             if (this._newMessageText) {
-                return this._newMessageText;
+                return this._newMessageText.replace(/(%s)/,commandText);
             }
             return '';
         }

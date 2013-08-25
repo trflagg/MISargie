@@ -201,7 +201,6 @@ module.exports = function() {
         var messageText = avatar.addMessage(node.p[0], node.p[1], node.p[2]);
 
         result = result.concat(messageText);
-
         callback(null, result, avatar);
     };
     codeHandler.registerFunction('addMessage', new AddMessage());
@@ -245,7 +244,6 @@ module.exports = function() {
 
         newNode = LoadMessage.super_.prototype.createCodeNode.call(this, params, message);
         newNode.func = "loadMessage";
-        // console.log(message);
         this.copyParams(params, newNode.p);
         message.messagesLoaded().push(params[0].trim());
 

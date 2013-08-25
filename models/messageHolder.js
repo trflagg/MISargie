@@ -8,6 +8,7 @@ module.exports = function(db, collectionName) {
         if (doc) {
             // load from doc
             this._messages = doc._messages;
+            this._newMessageText = doc._newMessageText
 
             // make a new messageHolder object for every child in doc
             this._children = {};
@@ -21,6 +22,7 @@ module.exports = function(db, collectionName) {
             // create new
             this._messages = {};
             this._children = {};
+            this._newMessageText = null;
         }
     }
     util.inherits(MessageHolder, Model);
@@ -30,6 +32,7 @@ module.exports = function(db, collectionName) {
 
         doc._messages = messageHolder._messages;
         doc._children = messageHolder._children;
+        doc._newMessageText = messageHolder._newMessageText;
 
         return doc;
     }
@@ -44,17 +47,26 @@ module.exports = function(db, collectionName) {
         return this._children[name];
     }
 
+    MessageHolder.prototype.setNewMessageText = function(text) {
+        this._newMessageText = text;
+    }
+
     MessageHolder.prototype.addMessage = function(commandText, messageName, child) {
         if (child) {
             // childArray[1] = first item of dot-separated children
             // childArray[2] = rest of the string (minus the dot)
             var childArray = /(\w+)(?:\.([\w.]+))*/.exec(child);
 
-            this.child(childArray[1]).addMessage(commandText, messageName, childArray[2]);
+            return this.child(childArray[1]).addMessage(commandText, messageName, childArray[2]);
         }
         else {
-            this._messages[commandText] = messageName;            
+            this._messages[commandText] = messageName;   
+            if (this._newMessageText) {
+                return this._newMessageText;
+            }
+            return '';
         }
+
     };
     MessageHolder.prototype.removeMessage = function(commandText) {
         if (this._messages.hasOwnProperty(commandText)) {

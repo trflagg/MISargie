@@ -198,7 +198,9 @@ module.exports = function() {
     }
 
     AddMessage.prototype.run = function(node, result, avatar, callback) {
-        avatar.addMessage(node.p[0], node.p[1], node.p[2]);
+        var messageText = avatar.addMessage(node.p[0], node.p[1], node.p[2]);
+
+        result = result.concat(messageText);
 
         callback(null, result, avatar);
     };

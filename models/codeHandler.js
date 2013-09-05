@@ -49,7 +49,8 @@ module.exports = function() {
             newNode = this._functions[func.functionName].createCodeNode(func.params, message, lines);
         }
         else {
-            console.log("can't compile unknown code node func: "+ func+"\nForgot a line return?");
+            console.log("can't compile unknown code node func:");
+            console.log(func);
             newNode = null;
         }
 

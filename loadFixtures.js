@@ -18,6 +18,7 @@ module.exports = function() {
         newMessage.setName(messageName);
         newMessage.setText(messageText);
         newMessage.compile();
+        console.log(messageName);
         db.save('Message', newMessage);
         // console.log(messageName);
     }

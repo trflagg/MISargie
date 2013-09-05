@@ -91,6 +91,18 @@ module.exports = function(db, collectionName) {
             return this._messages[commandText];
         }
     }
+    MessageHolder.prototype.childMessageCount = function() {
+        var count = Object.keys(this._messages).length;
+        if (this._children) {
+            for (var childName in this._children) {
+                if (this._children.hasOwnProperty(childName)) {
+                    count = count + this._children[childName].childMessageCount();
+                }
+            }
+        }
+
+        return count;
+    }
     MessageHolder.prototype.messageCount = function() {
         return Object.keys(this._messages).length;
     };
@@ -106,6 +118,7 @@ module.exports = function(db, collectionName) {
         for (var childName in children) {
             if (children.hasOwnProperty(childName)) {
                 var obj = {}
+                obj.childMessageCount = this._children[childName].childMessageCount();
                 obj.text = childName
                 obj.children = this._children[childName].getCommandTextList();
 

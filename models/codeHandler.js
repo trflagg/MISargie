@@ -264,6 +264,25 @@ module.exports = function() {
     };
     codeHandler.registerFunction('loadMessage', new LoadMessage());
 
+    var ClearMessages = function() {
+        ClearMessages.super_.call(this);
+        this.name = 'ClearMessages';
+        this.minParams = 0;
+    }
+    util.inherits(ClearMessages, FunctionObject);
+    ClearMessages.prototype.createCodeNode = function(params, message) {
+        this.checkParams(params);
+
+        newNode = ClearMessages.super_.prototype.createCodeNode.call(this, params, message);
+        newNode.func = 'clearMessages';
+
+        return newNode;
+    }
+    ClearMessages.prototype.run = function(node, result, avatar, callback) {
+        avatar.clear();
+        callback(null, result, avatar);
+    }
+    codeHandler.registerFunction('clearMessages', new ClearMessages());
 
 
     var IfGlobal = function() {

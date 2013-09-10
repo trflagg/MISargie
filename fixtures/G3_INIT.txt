@@ -1,3 +1,4 @@
+# INIT
 Security: Captain, a small state vessel is approaching.
 {% setGlobal(red_alert, 0) %}
 {% addMessage(On screen, G3_VESSEL_ON_SCREEN) %}

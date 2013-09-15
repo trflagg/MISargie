@@ -14,20 +14,23 @@ module.exports = function(db, callback) {
             // load our hero
             db.load('Avatar', {name: 'Picard'}, function(err, picard) {
                 assert.equal(err, null, err);
-                
-                // load first message
-                db.load('Message', {name: 'G2_INIT'}, function(err, message) {
-                    assert.equal(err, null, err);
-                    message.run(picard, function(err, result) {
-                        assert.equal(picard.getGlobal('level'), 1);
-                        assert.equal(result, 'A suspicious ship approaches.\n');
-                        assert.equal(picard.getCommandTextList()[0].text, 'Hail Ship');
-                        assert.equal(picard.getCommandTextList()[1].text, 'Red Alert');
+                callback(null, picard);
+            });
+        },
 
-                        // user decides to hail. run message
-                        picard.runMessage('Hail Ship', function(err, result) {
-                            callback(err, picard, result);
-                        });
+        function(picard, callback) {
+            // load first message
+            db.load('Message', {name: 'G2_INIT'}, function(err, message) {
+                assert.equal(err, null, err);
+                message.run(picard, function(err, result) {
+                    assert.equal(picard.getGlobal('level'), 1);
+                    assert.equal(result, 'A suspicious ship approaches.\n');
+                    assert.equal(picard.getCommandTextList()[0].text, 'Hail Ship');
+                    assert.equal(picard.getCommandTextList()[1].text, 'Red Alert');
+
+                    // user decides to hail. run message
+                    picard.runMessage('Hail Ship', function(err, result) {
+                        callback(err, picard, result);
                     });
                 });
             });

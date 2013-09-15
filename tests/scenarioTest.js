@@ -4,7 +4,8 @@ module.exports = function(db, callback) {
     var async = require('async'),
         assert = require('assert'),
         MessageHolder = require('../models/MessageHolder')(db),
-        Avatar = require('../models/Avatar')(db);
+        Avatar = require('../models/Avatar')(db),
+        Location = require('../models/Location')(db);
 
     console.log('_ Begin scenarioTest ___');
 
@@ -16,6 +17,17 @@ module.exports = function(db, callback) {
                 assert.equal(err, null, err);
                 callback(null, picard);
             });
+        },
+
+        function(picard, callback) {
+            // load location
+            picard.changeLocation('Border of the Neutral Zone', function(err, result) {
+                assert.equal(err, null, err);
+                assert.equal(picard.getLocation().getName(), 'Border of the Neutral Zone');
+                assert.equal(result, 'You are surrounded by empty space.\n');
+
+                callback(null, picard);
+            })
         },
 
         function(picard, callback) {

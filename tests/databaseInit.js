@@ -8,7 +8,8 @@ module.exports = function(db, callback) {
     var async = require('async'),
         Message = require('../models/Message')(db),
         MessageHolder = require('../models/MessageHolder')(db),
-        Avatar = require('../models/Avatar')(db);
+        Avatar = require('../models/Avatar')(db),
+        Location = require('../models/Location')(db);
 
     console.log('_ Begin databaseInit ___');
 
@@ -48,6 +49,23 @@ module.exports = function(db, callback) {
                 ship.addChild('shields', new MessageHolder());
                 avatar.addChild('ship', ship);
                 db.save('Avatar', avatar, function(err) { callback(err) });
+            },
+
+            function(callback) {
+                db.deleteAll('Location');
+                var loc = db.create('Location');
+                loc.setName('Border of the Neutral Zone');
+                loc.setDescription('The farthest edge of space under federation control.');
+                loc.setMessage('G2_LOC_NEUTRAL_ZONE');
+                db.save('Location', loc, function(err) { callback(err) });
+            },
+
+            function(callback) {
+                var m1 = db.create('Message');
+                m1.setName('G2_LOC_NEUTRAL_ZONE');
+                m1.setText('You are surrounded by empty space.');
+                m1.compile();
+                db.save('Message', m1, function(err) { callback(err) });
             },
 
             function(callback) {

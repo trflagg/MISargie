@@ -11,11 +11,13 @@ module.exports = function(db, collectionName) {
         if (doc) {
             // load from doc
             this._name = doc.name;
+            this._location = doc.location;
             this._globals = doc.globals;
         }
         else 
         {
             // new avatar
+            this._location = null;
             this._globals = {};
         }
     }
@@ -25,6 +27,7 @@ module.exports = function(db, collectionName) {
         var doc = Avatar.super_.prototype.onSave(avatar);
 
         doc.name = avatar._name;
+        doc.location = avatar._location;
         doc.globals = avatar._globals;
         return doc;
     };
@@ -52,6 +55,32 @@ module.exports = function(db, collectionName) {
 
         return this._globals[key];
     };
+
+    Avatar.prototype.setLocation = function(location) {
+        this._location = location;
+    };
+    Avatar.prototype.getLocation = function() {
+        return this._location;
+    };
+    Avatar.prototype.changeLocation = function(locationName, callback) {
+        // look up location
+        // callback variable
+        var avatar = this;
+        db.load('Location', {name: locationName}, function(err, location) {
+            if (err) {
+                return callback(err, null);
+            }
+            avatar.setLocation(location);
+            // run message
+            db.load('Message', {name: location.getMessage()}, function(err, message) {
+                if (err) {
+                    return callback(err, null);
+                }
+                var result = message.run(avatar, callback);
+            });
+            
+        })
+    }
 
     Avatar.prototype.runMessage = function(commandText, child, callback) {
         // make child optional

@@ -153,6 +153,8 @@ module.exports = function(db, callback) {
                 m1.setText('Alarms go off signaling that the enemy vessel has readied its weapons. \n \
                     {% ifGlobal(response, eq, 1) %} \n \
                     Lasers strike from the front of the enemy ship, but they disintegrate in the shield. \n \
+                    {% yield(3) %} \n \
+                    The lasers go off again but the shields hold. \n \
                     {% endif %} \n \
                     {% ifGlobal(response, eq, 2) %} \n \
                     Lasers strike from the front of the enemy ship. They create two large holes in your port engines. \n \

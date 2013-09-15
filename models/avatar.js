@@ -1,6 +1,7 @@
 module.exports = function(db, collectionName) {
 
     var util = require('util'),
+        codeHandler = require('./codeHandler'),
         MessageHolder = require('./messageHolder')(db),
         returnObject = {},
         collectionName = collectionName || 'avatars'
@@ -13,12 +14,16 @@ module.exports = function(db, collectionName) {
             this._name = doc.name;
             this._location = doc.location;
             this._globals = doc.globals;
+            this._yieldTime = doc.yieldTimer;
+            this._yieldBlock = doc.yieldBlock;
         }
         else 
         {
             // new avatar
             this._location = null;
             this._globals = {};
+            this._yieldTime = null;
+            this._yieldBlock = null;
         }
     }
     util.inherits(Avatar, MessageHolder);
@@ -29,6 +34,8 @@ module.exports = function(db, collectionName) {
         doc.name = avatar._name;
         doc.location = avatar._location;
         doc.globals = avatar._globals;
+        doc.yieldTime = avatar._yieldTime;
+        doc.yieldBlock = avatar._yieldBlock;
         return doc;
     };
 
@@ -49,7 +56,7 @@ module.exports = function(db, collectionName) {
         return this;
     };
     Avatar.prototype.getGlobal = function(key) {
-        if (!this._globals || !this._globals[key]) {
+        if (!this._globals || !this._globals.hasOwnProperty(key)) {
             return null;
         }
 
@@ -80,6 +87,30 @@ module.exports = function(db, collectionName) {
             });
             
         })
+    };
+
+    Avatar.prototype.setYieldTime = function(timeInSeconds) {
+        var currentTime = Date.now();
+        var futureTime = currentTime + (parseInt(timeInSeconds, 10) * 1000);
+        this._yieldTime = new Date(futureTime);
+    }
+    Avatar.prototype.getYieldTime = function() {
+        return this._yieldTime;
+    }
+    Avatar.prototype.setYieldBlock = function(block) {
+        this._yieldBlock = block;
+    }
+    Avatar.prototype.getYieldBlock = function() {
+        return this._yieldBlock;
+    }
+    Avatar.prototype.pollForYield = function(callback) {
+        if (this.getGlobal('yield') == 1) {
+            if (Date.now() >= this._yieldTime) {
+                this.setGlobal('yield', 0);
+                return codeHandler.runNode(this._yieldBlock, '', this, callback);
+            }
+        }
+        callback(null, false, this);
     }
 
     Avatar.prototype.runMessage = function(commandText, child, callback) {

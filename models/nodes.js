@@ -29,5 +29,11 @@ module.exports = function() {
     };
     util.inherits(exports.IfNode, exports.CodeNode);
 
+    exports.YieldNode = function() {
+        exports.YieldNode.super_.call(this);
+        this.block = null;
+    };
+    util.inherits(exports.YieldNode, exports.CodeNode);
+
     return exports;
 }();

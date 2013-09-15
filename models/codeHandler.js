@@ -291,7 +291,6 @@ module.exports = function() {
         this.minParams = 3;
     }
     util.inherits(IfGlobal, FunctionObject);
-
     IfGlobal.prototype.createCodeNode = function(params, message, lines) {
         this.checkParams(params);
 
@@ -334,7 +333,6 @@ module.exports = function() {
 
         return newNode;
     }
-
     IfGlobal.prototype.run = function(node, result, avatar, callback) {
         // ifGlobal(globalName, comparison, value)
         var global = avatar.getGlobal(node.p[0]);
@@ -357,6 +355,43 @@ module.exports = function() {
         }
     }
     codeHandler.registerFunction('ifGlobal', new IfGlobal());
+
+    var Yield = function() {
+        Yield.super_.call(this);
+        this.name = 'Yield'
+        this.minParams = 1;
+    }
+    util.inherits(Yield, FunctionObject);
+    Yield.prototype.createCodeNode = function(params, message, lines) {
+        this.checkParams(params);
+
+        var newNode = new Nodes.YieldNode();
+        newNode.func = 'yield';
+        this.copyParams(params, newNode.p);
+
+        // copy the rest of the text into an array
+        var blockLines = [],
+            currentLine = lines.shift();
+        while(currentLine != null) {
+            blockLines.push(currentLine.trim());
+
+            currentLine = lines.shift();
+        }
+        // and turn that array into a node and save it
+        var blockNode = codeHandler.createNode(blockLines, message);
+        newNode.block = blockNode;
+        return newNode;
+    }
+    Yield.prototype.run = function(node, result, avatar, callback) {
+        avatar.setGlobal('yield', 1);
+        avatar.setYieldTime(node.p[0]);
+        avatar.setYieldBlock(node.block);
+        
+        callback(null, result, avatar);
+    };
+    codeHandler.registerFunction('yield', new Yield());
+
+
 
 
     return codeHandler;

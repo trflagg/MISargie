@@ -1,6 +1,8 @@
 
 module.exports = function(db, callback) {
 
+    var Fiber = require('fibers');
+
     var async = require('async'),
         assert = require('assert'),
         MessageHolder = require('../models/MessageHolder')(db),
@@ -8,6 +10,14 @@ module.exports = function(db, callback) {
         Location = require('../models/Location')(db);
 
     console.log('_ Begin scenarioTest ___');
+    
+    var sleep = function(ms) {
+        var fiber = Fiber.current;
+        setTimeout(function() {
+            fiber.run();
+        }, ms);
+        Fiber.yield();
+    };
 
     async.waterfall([
 
@@ -104,7 +114,23 @@ module.exports = function(db, callback) {
         function(picard, result, callback) {
             assert.equal(result, 'Alarms go off signaling that the enemy vessel has readied its weapons.\nLasers strike from the front of the enemy ship, but they disintegrate in the shield.\n\n');
             assert.equal(picard.getGlobal('response'), 1);
-            callback(null);
+            // test yield
+            assert.equal(picard.getGlobal('yield'), 1);
+            picard.pollForYield(function(err, result, avatar) {
+                assert.equal(err, null, err);
+                assert.equal(result, false);
+                // wait 5s
+                Fiber(function() {
+                    console.log('wait 5s');
+                    sleep(5000);
+                    picard.pollForYield(function(err, result, avatar) {
+                        assert.equal(err, null, err);
+                        assert.equal(result, 'The lasers go off again but the shields hold.\n');
+                        assert.equal(picard.getGlobal('yield'), 0);
+                        callback(null);
+                    });
+                }).run();
+            });
         }
 
     ],

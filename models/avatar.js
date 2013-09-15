@@ -54,6 +54,12 @@ module.exports = function(db, collectionName) {
     };
 
     Avatar.prototype.runMessage = function(commandText, child, callback) {
+        // make child optional
+        if (typeof child === 'function') {
+            callback = child;
+            child = '';
+        }
+
         var messageName = this.message(commandText, child);
         //callback variable
         var avatar = this;

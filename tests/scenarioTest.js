@@ -21,8 +21,8 @@ module.exports = function(db, callback) {
                     message.run(picard, function(err, result) {
                         assert.equal(picard.getGlobal('level'), 1);
                         assert.equal(result, 'A suspicious ship approaches.\n');
-                        assert.equal(picard.getCommandTextList()[0], 'Hail Ship');
-                        assert.equal(picard.getCommandTextList()[1], 'Red Alert');
+                        assert.equal(picard.getCommandTextList()[0].text, 'Hail Ship');
+                        assert.equal(picard.getCommandTextList()[1].text, 'Red Alert');
 
                         // user decides to hail. run message
                         picard.runMessage('Hail Ship', function(err, result) {
@@ -61,8 +61,8 @@ module.exports = function(db, callback) {
                 assert.equal(err, null, err);
                 message.run(picard, function(err, result) {
                     assert.equal(result, 'A suspicious ship approaches.\n');
-                    assert.equal(picard.getCommandTextList()[0], 'Hail Ship');
-                    assert.equal(picard.getCommandTextList()[1], 'Red Alert');
+                    assert.equal(picard.getCommandTextList()[0].text, 'Hail Ship');
+                    assert.equal(picard.getCommandTextList()[1].text, 'Red Alert');
 
                     // user decides to go on red alert.
                     picard.runMessage('Red Alert', function(err, result) {
@@ -75,9 +75,9 @@ module.exports = function(db, callback) {
 
         function(picard, result, callback) {
             assert.equal(result, 'The ships reverses thrust and comes to a complete halt. It hails you.\n');
-            assert.equal(picard.getCommandTextList()[0], 'Respond to hail');
-            assert.equal(picard.child('ship').child('weapons').getCommandTextList()[0], 'Ready weapons');
-            assert.equal(picard.getCommandTextList()[1], 'Shields up');
+            assert.equal(picard.getCommandTextList()[0].text, 'Respond to hail');
+            assert.equal(picard.child('ship').child('weapons').getCommandTextList()[0].text, 'Ready weapons');
+            assert.equal(picard.getCommandTextList()[1].text, 'Shields up');
 
             // user responds shields up
             picard.runMessage('Shields up', function(err, result) {

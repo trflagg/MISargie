@@ -4,7 +4,7 @@
 module.exports.runTests = function() {
     var assert = require('assert'),
          async = require('async'),
-         Db = require('../db');
+         Db = require('../argieDb/db');
 
 
     console.log('\n________ Running All Tests ____________');

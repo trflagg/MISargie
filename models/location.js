@@ -1,7 +1,7 @@
 module.exports = function(db, collectionName) {
     var util = require('util'),
         async = require('async'),
-        Model = require('./Model')(db),
+        Model = require('../argieDb/model')(db),
         collectionName = collectionName || 'location';
 
 

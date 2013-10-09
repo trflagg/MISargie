@@ -2,7 +2,7 @@ module.exports = function(db, collectionName) {
     var util = require('util'),
         async = require('async'),
         codeHandler = require('./codeHandler'),
-        Model = require('./Model')(db),
+        Model = require('../argieDb/model')(db),
         Nodes = require('./Nodes'),
         collectionName = collectionName || 'messages';
 

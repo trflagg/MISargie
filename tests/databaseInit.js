@@ -9,12 +9,13 @@ module.exports = function(db, callback) {
         Message = require('../models/Message')(db),
         MessageHolder = require('../models/MessageHolder')(db),
         Avatar = require('../models/Avatar')(db),
-        Location = require('../models/Location')(db);
+        Location = require('../models/Location')(db),
+        Quest = require('../models/Quest')(db);
 
     console.log('_ Begin databaseInit ___');
 
     async.waterfall([
-            
+
             // make avatar
             function(callback) {
                 db.deleteAll('Avatar');
@@ -58,6 +59,14 @@ module.exports = function(db, callback) {
                 loc.setDescription('The farthest edge of space under federation control.');
                 loc.setMessage('G2_LOC_NEUTRAL_ZONE');
                 db.save('Location', loc, function(err) { callback(err) });
+            },
+
+            function(callback) {
+                db.deleteAll('Quest');
+                var quest = db.create('Quest');
+                quest.setName('Partol the Neutral Zone');
+                quest.setDescription('Make sure no bad people come in.');
+                db.save('Quest', quest, function(err) { callback(err) });
             },
 
             function(callback) {
@@ -109,7 +118,7 @@ module.exports = function(db, callback) {
                     {% removeMessage(Hail Ship) %}');
                 m1.compile();
                 db.save('Message', m1, function(err) {
-                    callback(err) 
+                    callback(err)
                 });
             },
 
@@ -121,7 +130,7 @@ module.exports = function(db, callback) {
                     {% loadMessage(G2_SHIP_THREATENS) %}');
                 m1.compile();
                 db.save('Message', m1, function(err) {
-                    callback(err) 
+                    callback(err)
                 });
             },
 
@@ -132,7 +141,7 @@ module.exports = function(db, callback) {
                     {% loadMessage(G2_SHIP_THREATENS) %}');
                 m1.compile();
                 db.save('Message', m1, function(err) {
-                    callback(err) 
+                    callback(err)
                 });
             },
 
@@ -143,7 +152,7 @@ module.exports = function(db, callback) {
                     {% loadMessage(G2_SHIP_THREATENS) %}');
                 m1.compile();
                 db.save('Message', m1, function(err) {
-                    callback(err) 
+                    callback(err)
                 });
             },
 
@@ -168,8 +177,8 @@ module.exports = function(db, callback) {
                     {% endif %} \n');
                 m1.compile();
                 db.save('Message', m1, function(err) {
-                    console.log("created scenario."); 
-                    callback(err) 
+                    console.log("created scenario.");
+                    callback(err)
                 });
             }
 

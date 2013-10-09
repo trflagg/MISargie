@@ -1,6 +1,11 @@
+
+
 var fs = require('fs'),
     EventEmitter = require('events').EventEmitter,
+    yaml = require('js-yaml');
     Db = require('./db');
+
+var fixtures_dir = './fixtures/';
 
 // load all files in /frameworks as messages
 module.exports = function() {
@@ -10,6 +15,7 @@ module.exports = function() {
     var environment = require(env),
         db = new Db(environment),
         Message = require('./models/Message')(db),
+        Location = require('./models/Location')(db),
         fileEmitter = new EventEmitter(),
         messageList = [];
 
@@ -23,15 +29,19 @@ module.exports = function() {
         // console.log(messageName);
     }
 
-    // remove all to begin
-    db.deleteAll('Message');
+    var saveLocation = function(name, description, message_name) {
+        var newLocation = db.create("Location");
+        newLocation.setName(name);
+        newLocation.setDescription(description);
+        newLocation.setMessage(message_name);
+        console.log(name);
+        db.save("Location", newLocation);
+    }
 
-    // load all files in directory and emit event.
-    fs.readdirSync('./fixtures').forEach(function(file) {
-        console.log(file);
-        var data = fs.readFileSync('./fixtures/' + file, {encoding: 'utf8'})
+    var processMsgsFile = function(filename) {
+        var data = fs.readFileSync(fixtures_dir + filename, {encoding: 'utf8'})
 
-        // check for multi-message file.
+        // check for multi-message filename.
         // starts with # [messageName]
         if (data[0] === "#") {
             lines = data.split('\n');
@@ -60,9 +70,48 @@ module.exports = function() {
         }
         else {
             // take off extension
-            var messageName = /(\w+)\.\w+/.exec(file)[1];
+            var messageName = /(\w+)\.\w+/.exec(filename)[1];
             var messageText = data;
             saveMessage(messageName, messageText);
+        }
+    }
+
+    var processYamlFile = function(filename) {
+        var data = fs.readFileSync(fixtures_dir + filename, {encoding: 'utf8'});
+        var doc = yaml.safeLoad(data);
+
+        for(var i=0, ll = doc.length; i<ll; i++) {
+            obj = doc[i];
+            // default: message
+            if (typeof obj.type === 'undefined' || obj.type === 'message') {
+                saveMessage(obj.name, obj.text);
+            }
+
+            // location
+            else if (obj.type === 'location') {
+                saveLocation(obj.name, obj.description, obj.message);
+            }
+        }
+    }
+
+    // EXECUTION STARTS HERE
+    String.prototype.endsWith = function(suffix) {
+        return this.indexOf(suffix, this.length - suffix.length) !== -1;
+    };
+
+    // remove all to begin
+    db.deleteAll('Message');
+
+    // load all files in directory
+    fs.readdirSync(fixtures_dir).forEach(function(file) {
+        console.log(file);
+
+        // check extension
+        if (file.endsWith('.msgs')) {
+            processMsgsFile(file);
+        }
+        else if (file.endsWith('.yaml') || file.endsWith('.yml')) {
+            processYamlFile(file);
         }
 
         console.log('saved ----------------------');

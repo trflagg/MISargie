@@ -2,7 +2,7 @@ module.exports = function(db, collectionName) {
     var util = require('util'),
         async = require('async'),
         Model = require('./Model')(db),
-        collectionName = collectionName || 'locations';
+        collectionName = collectionName || 'location';
 
 
     Location = function(doc) {

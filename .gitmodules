@@ -1,0 +1,3 @@
+[submodule "argieDB"]
+	path = argieDB
+	url = ./argieDB/

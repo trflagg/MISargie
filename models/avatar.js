@@ -4,7 +4,7 @@ module.exports = function(db, collectionName) {
         codeHandler = require('./codeHandler'),
         MessageHolder = require('./messageHolder')(db),
         returnObject = {},
-        collectionName = collectionName || 'avatars'
+        collectionName = collectionName || 'avatars';
 
     Avatar = function(doc) {
         Avatar.super_.call(this, doc);
@@ -14,6 +14,14 @@ module.exports = function(db, collectionName) {
             this._name = doc.name;
             this._location = doc.location;
             this._globals = doc.globals;
+            this._bNums = {};
+            for (key in doc.bNums) {
+                if (doc.bNums.hasOwnProperty(key)) {
+                    var constructor = db.getConstructor('bNum');
+                    var bNum = new constructor(doc.bNums[key]);
+                    this.setBNum(key, bNum);
+                }
+            }
             this._yieldTime = doc.yieldTimer;
             this._yieldBlock = doc.yieldBlock;
         }
@@ -22,6 +30,7 @@ module.exports = function(db, collectionName) {
             // new avatar
             this._location = null;
             this._globals = {};
+            this._bNums = {};
             this._yieldTime = null;
             this._yieldBlock = null;
         }
@@ -34,6 +43,13 @@ module.exports = function(db, collectionName) {
         doc.name = avatar._name;
         doc.location = avatar._location;
         doc.globals = avatar._globals;
+        doc.bNums = {};
+        for (key in avatar._bNums) {
+            if (avatar._bNums.hasOwnProperty(key)) {
+                var bNum = avatar._bNums[key];
+                doc.bNums[key] = bNum.onSave(bNum);
+            }
+        }
         doc.yieldTime = avatar._yieldTime;
         doc.yieldBlock = avatar._yieldBlock;
         return doc;
@@ -61,6 +77,23 @@ module.exports = function(db, collectionName) {
         }
 
         return this._globals[key];
+    };
+
+    Avatar.prototype.setBNum = function(key, value, callback) {
+        this._bNums[key] = value;
+
+        if (typeof callback === 'function') {
+            return this.save(callback);
+        }
+
+        return this;
+    };
+    Avatar.prototype.getBNum = function(key) {
+        if (!this._bNums || !this._bNums.hasOwnProperty(key)) {
+            return null;
+        }
+
+        return this._bNums[key];
     };
 
     Avatar.prototype.setLocation = function(location) {

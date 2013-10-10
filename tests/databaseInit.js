@@ -9,6 +9,7 @@ module.exports = function(db, callback) {
         Message = require('../models/Message')(db),
         MessageHolder = require('../models/MessageHolder')(db),
         Avatar = require('../models/Avatar')(db),
+        BNum = require('../models/bNum')(db),
         Location = require('../models/Location')(db),
         Quest = require('../models/Quest')(db);
 
@@ -39,6 +40,13 @@ module.exports = function(db, callback) {
                     callback(err);
                 });
 
+            },
+
+            // misc
+            function(callback) {
+                db.deleteAll('bNum');
+
+                callback(null);
             },
 
             // make scenario data

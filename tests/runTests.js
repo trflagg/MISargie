@@ -31,6 +31,10 @@ module.exports.runTests = function() {
             },
             function(callback) {
                 console.log('');
+                require('./bNumTest')(db, callback);
+            },
+            function(callback) {
+                console.log('');
                 require('./scenarioTest')(db, callback);
             }
         ],

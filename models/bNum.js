@@ -47,6 +47,16 @@ module.exports = function(db, collectionName) {
         return this._value;
     }
 
+    BNum.prototype.addBNum = function(amount) {
+        var currentVal = this._value;
+
+        if (currentVal > 0) {
+            this._value = ((1 - currentVal) * amount) + currentVal;
+        }
+        else {
+            this._value = ((1 + currentVal) * amount) + currentVal;
+        }
+    }
     db.register('bNum', BNum);
 
     return BNum;

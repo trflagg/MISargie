@@ -7,6 +7,8 @@ module.exports = function(db, callback) {
     console.log('_ Begin bNumTest ___');
 
     async.waterfall([
+
+        // test save.('bNum',.
         function(callback) {
             var bNum = db.create('bNum');
             bNum.setValue(0.1);
@@ -17,6 +19,7 @@ module.exports = function(db, callback) {
             });
         },
 
+        // test load('bNum',... and save validation
         function(callback) {
             db.load('bNum', {value: 0.1}, function(err, foundBNum) {
                 assert.equal(err, null);
@@ -33,6 +36,7 @@ module.exports = function(db, callback) {
             });
         },
 
+        // test avatar.setBNum()
         function(callback) {
             db.load('Avatar', {name: 'Joe'}, function(err, avatar) {
                 assert.notEqual(avatar, null);
@@ -45,14 +49,17 @@ module.exports = function(db, callback) {
             });
         },
 
-        // test addMessage function.
+        // test avatar.addBNum()
         function(callback) {
             db.load('Avatar', {name: 'Joe'}, function(err, avatar) {
                 var bNum = avatar.getBNum('bNumTest');
                 assert.equal(bNum.getValue(), 0.5);
+                assert.equal(avatar.getBNum('bNumTest.2').getValue(), -0.756);
+                avatar.addBNum('bNumTest', -0.75);
+                assert.equal(avatar.getBNum('bNumTest').getValue(), 0.125);
                 callback(null);
             });
-        }
+        },
 
     ],
         function(err, result) {

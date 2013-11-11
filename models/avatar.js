@@ -95,6 +95,15 @@ module.exports = function(db, collectionName) {
 
         return this._bNums[key];
     };
+    Avatar.prototype.addBNum = function(key, amount, callback) {
+        if (!this._bNums || !this._bNums.hasOwnProperty(key)) {
+            return null;
+        }
+
+        return this._bNums[key].addBNum(amount);
+
+
+    }
 
     Avatar.prototype.setLocation = function(location) {
         this._location = location;

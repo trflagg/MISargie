@@ -28,7 +28,7 @@ module.exports = function() {
 		this.avatar.setBNum(name, value);
 	}
 	AvatarWrapper.prototype.getBNum = function(name) {
-		this.avatar.getBNum(name);
+		return this.avatar.getBNum(name);
 	};
 	AvatarWrapper.prototype.addBNum = function(name, amount) {
 		this.avatar.addBNum(name, amount);

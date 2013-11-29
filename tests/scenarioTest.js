@@ -34,7 +34,7 @@ module.exports = function(db, callback) {
             picard.changeLocation('Border of the Neutral Zone', function(err, result) {
                 assert.equal(err, null, err);
                 assert.equal(picard.getLocation().getName(), 'Border of the Neutral Zone');
-                assert.equal(result, 'You are surrounded by empty space.\n');
+                assert.equal(result, 'You are surrounded by empty space.');
 
                 callback(null, picard);
             })
@@ -112,18 +112,18 @@ module.exports = function(db, callback) {
         },
 
         function(picard, result, callback) {
-            assert.equal(result, 'Alarms go off signaling that the enemy vessel has readied its weapons.\nLasers strike from the front of the enemy ship, but they disintegrate in the shield.\n\n');
+            assert.equal(result, 'Alarms go off signaling that the enemy vessel has readied its weapons.\nLasers strike from the front of the enemy ship, but they disintegrate in the shield.\n ');
             assert.equal(picard.getGlobal('response'), 1);
             // test yield
             assert.equal(picard.getGlobal('yield'), 1);
-            picard.pollForYield(function(err, result, avatar) {
+            picard.pollForYield(function(err, result) {
                 assert.equal(err, null, err);
                 assert.equal(result, false);
                 // wait 5s
                 Fiber(function() {
                     console.log('wait 5s');
                     sleep(5000);
-                    picard.pollForYield(function(err, result, avatar) {
+                    picard.pollForYield(function(err, result) {
                         assert.equal(err, null, err);
                         assert.equal(result, 'The lasers go off again but the shields hold.\n');
                         assert.equal(picard.getGlobal('yield'), 0);

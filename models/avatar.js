@@ -23,7 +23,7 @@ module.exports = function(db, collectionName) {
                 }
             }
             this._yieldTime = doc.yieldTimer;
-            this._yieldBlock = doc.yieldBlock;
+            this._yieldMessage = doc.yieldMessage;
         }
         else 
         {
@@ -32,7 +32,7 @@ module.exports = function(db, collectionName) {
             this._globals = {};
             this._bNums = {};
             this._yieldTime = null;
-            this._yieldBlock = null;
+            this._yieldMessage = null;
         }
     }
     util.inherits(Avatar, MessageHolder);
@@ -51,7 +51,7 @@ module.exports = function(db, collectionName) {
             }
         }
         doc.yieldTime = avatar._yieldTime;
-        doc.yieldBlock = avatar._yieldBlock;
+        doc.yieldMessage = avatar._yieldMessage;
         return doc;
     };
 
@@ -139,20 +139,27 @@ module.exports = function(db, collectionName) {
     Avatar.prototype.getYieldTime = function() {
         return this._yieldTime;
     }
-    Avatar.prototype.setYieldBlock = function(block) {
-        this._yieldBlock = block;
+    Avatar.prototype.setYieldMessage = function(message_id) {
+        this._yieldMessage = message_id;
     }
-    Avatar.prototype.getYieldBlock = function() {
-        return this._yieldBlock;
+    Avatar.prototype.getYieldMessage = function() {
+        return this._yieldMessage;
     }
     Avatar.prototype.pollForYield = function(callback) {
         if (this.getGlobal('yield') == 1) {
             if (Date.now() >= this._yieldTime) {
                 this.setGlobal('yield', 0);
-                return codeHandler.runNode(this._yieldBlock, '', this, callback);
+                db.load('Message', {name: this._yieldMessage}, function(err, message) {
+                    if (err) {
+                        return callback(err, null);
+                    }
+                    return message.run(this, callback);
+                });
+                return;
             }
         }
-        callback(null, false, this);
+
+        callback(null, false);
     }
 
     Avatar.prototype.runMessage = function(commandText, child, callback) {

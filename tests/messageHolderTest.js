@@ -57,7 +57,6 @@ module.exports = function(db, callback) {
                 weapons.addMessage('Fire Lasers', 'G1_FIRE_LASERS');
                 weapons.addMessage('Fire Torpedos', 'G1_FIRE_TORPEDOS');
                 avatar.addChild('Weapons', weapons);
-                
                 db.save('Avatar', avatar, function(err, result) {
                     assert.equal(err, null);
                     callback(null);

@@ -16,8 +16,10 @@ module.exports = function(db, callback) {
 
             message.compile();
             assert.notEqual(message.getCompiled(), null);
-            assert.equal(message.getCompiled().text, 'Hello world!');
-            assert.equal(message.getCompiled().nextSibling, null);
+            // assert.equal(message.getCompiled().text, 'Hello world!');
+            // assert.equal(message.getCompiled().nextSibling, null);
+            template = message.getCompiled();
+            assert.equal(template(), 'Hello world!');
             callback(null);
         },
 
@@ -25,12 +27,10 @@ module.exports = function(db, callback) {
         function(callback) {
             db.load('Message', {name: 'G1_RED_ALERT'}, function(err, foundMessage) {
                 assert.equal(err, null);
-                var node = foundMessage.compile();
-                assert.notEqual(node, 'hello');
-                assert.equal(node.type, 'text');
-                assert.equal(node.nextSibling.type, 'code');
-                assert.equal(node.nextSibling.p[0], 'red_alert');
-                assert.equal(node.nextSibling.nextSibling.text, 'Battlestations!');
+                var template = foundMessage.compile();
+                var avatar = db.create('Avatar');
+                var message_result = template({avatar: avatar});
+
                 db.save('Message', foundMessage, function(err) {
                     assert.equal(err, null);
                     callback(null, foundMessage);

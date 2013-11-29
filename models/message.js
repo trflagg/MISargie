@@ -1,9 +1,11 @@
 module.exports = function(db, collectionName) {
     var util = require('util'),
         async = require('async'),
-        codeHandler = require('./codeHandler'),
+        underscore = require('underscore'),
         Model = require('../argieDb/model')(db),
         Nodes = require('./Nodes'),
+        System = require('./systemWrapper')(),
+        AvatarWrapper = require('./avatarWrapper')(),
         collectionName = collectionName || 'messages';
 
 
@@ -78,6 +80,9 @@ module.exports = function(db, collectionName) {
     Message.prototype.messagesLoaded = function() {
         return this._messagesLoaded;
     }
+    Message.prototype.addLoadedMessage = function(message_id) {
+        this._messagesLoaded.push(message_id);
+    }
     Message.prototype.globalsRequested = function() {
         return this._globalsRequested;
     }
@@ -86,23 +91,24 @@ module.exports = function(db, collectionName) {
         return this._compiled;
     }
     Message.prototype.compile = function() {
-        if (this.text === null) {
+        if (this._text === null) {
             this._compiled = null;
             return null;
         }
 
-        var firstNode = codeHandler.createNode(this._text.split('\n'), this);
-        this._compiled = firstNode;
-        return firstNode;
+        this._compiled = underscore.template(this._text);
+        return this._compiled;
     }
 
 
     Message.prototype.run = function(avatar, callback) {
-        if (this._compiled === null) {
+        if (!this._compiled) {
             this.compile();
         }
 
-            // console.log('Running: '+this.getName());
+        var system = new System(avatar);
+        var avatarWrapper = new AvatarWrapper(avatar);
+
         // load any messages
         var messagesLoaded = this.messagesLoaded();
         if (messagesLoaded.length > 0) {
@@ -118,14 +124,22 @@ module.exports = function(db, collectionName) {
                 for(var i=0, ll=messages.length; i<ll; i++) {
                     msgObject[messages[i].getName()] = messages[i];
                 }
-                avatar.loadedMessages = msgObject;
+                system.loadedMessages = msgObject;
                 // kick it off
-                codeHandler.runNode(originalMessage._compiled, '', avatar, callback);
+                result = originalMessage._compiled({
+                            avatar: avatarWrapper, 
+                            system: system
+                        })
+                callback(null, result);
             });
         }
         else {
             // kick it off
-            codeHandler.runNode(this._compiled, '', avatar, callback);
+            result = this._compiled({
+                            avatar: avatar, 
+                            system: system
+                        })
+            callback(null, result);
         }
     };
     db.register('Message', Message);

@@ -182,6 +182,7 @@ module.exports = function(db, callback) {
                 m1.setName('G2_SHIP_THREATENS');
                 m1.addLoadedMessage('G2_FIRE_AGAIN');
                 m1.setText('Alarms go off signaling that the enemy vessel has readied its weapons.\n' +
+                    '<%= system.wait(1000) %>\n' + 
                     '<% if(avatar.getGlobal("response") == 1) {%>' +
                         'Lasers strike from the front of the enemy ship, but they disintegrate in the shield.\n' +
                         '<% avatar.yield(3, "G2_FIRE_AGAIN") %>' +                    

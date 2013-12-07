@@ -1,28 +1,40 @@
 
 var firstMessage = 'INIT';
 
-var Fiber = require('fibers');
-
 var environment = require('./environments/environment-local'),
     readline = require('readline'),
-    Db = require('./argieDb/db');
+    Db = require('./argieDb/db'),
+    constants = require('./constants');
 
-function sleep(ms) {
-    var fiber = Fiber.current;
-    setTimeout(function() {
-        fiber.run();
-    }, ms);
-    Fiber.yield();
+
+// the worst thing ever to do in nodejs EVER
+function sleep(miliseconds) {
+    var start = new Date;
+    
+    // NEVER DO THIS!  I AM A PROFESSIONAL!
+    while((new Date - start) <= miliseconds) {
+        ;
+    }
 }
 
-function printLines(result) {
+function printLines(result, callback) {
     clearScreen();
 
     if (result) {
         var lines = result.split('\n');
 
         for (var i = 0, ll = lines.length; i<ll; i++) {
-            console.log(lines[i]);
+            var currentLine = lines[i];
+
+            // check for wait string
+            // console.log(constants.waitRegEx.exec(currentLine));
+            if ((regExArray = constants.waitRegEx.exec(currentLine)) != null) {
+                // wait in the worst way possible
+                sleep(regExArray[1])
+            }
+            else {
+                console.log(currentLine);
+            }
         }
     }
 }

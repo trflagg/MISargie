@@ -5,6 +5,8 @@ module.exports = function(db, callback) {
 
     var async = require('async'),
         assert = require('assert'),
+        util = require('util'),
+        constants = require('../constants'),
         MessageHolder = require('../models/MessageHolder')(db),
         Avatar = require('../models/Avatar')(db),
         Location = require('../models/Location')(db);
@@ -112,7 +114,11 @@ module.exports = function(db, callback) {
         },
 
         function(picard, result, callback) {
-            assert.equal(result, 'Alarms go off signaling that the enemy vessel has readied its weapons.\nLasers strike from the front of the enemy ship, but they disintegrate in the shield.\n ');
+            assert.equal(result, 'Alarms go off signaling that the enemy vessel has readied its weapons.\n' +
+                    util.format(constants.waitString,1) +
+                    '\nLasers strike from the front of the enemy ship, but they disintegrate in the shield.\n ');
+            // test waitRegEx
+            assert(constants.waitRegEx.test(result.split('\n')[1]));
             assert.equal(picard.getGlobal('response'), 1);
             // test yield
             assert.equal(picard.getGlobal('yield'), 1);

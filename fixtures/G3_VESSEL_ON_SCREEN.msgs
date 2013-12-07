@@ -1,0 +1,18 @@
+# G3_VESSEL_ON_SCREEN
+<% avatar.removeMessage("On screen") %>
+The vessel is a small diplomatic cruiser with the purple markings of the Arthurians.
+<% avatar.addMessage("Who are they?", "G3_WHO_ARE_THEY") %>
+
+#--
+# G3_WHO_ARE_THEY
+It appears to be a diplomatic ship from the Aquarius region.
+
+#--
+# G3_RED_ALERT
+<% avatar.setGlobal("red_alert", 1) %>
+Alarms ring and the wall behind you starts glowing red.
+<%= system.wait(2000) %>
+The ship begins turning around.
+<%= system.wait(1000) %>
+
+

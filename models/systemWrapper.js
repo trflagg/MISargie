@@ -5,6 +5,9 @@
  */
 module.exports = function() {
 
+	var util = require('util'),
+		constants = require('../constants');
+
 	System = function() {
 		this.loadedMessages = [];
 	};
@@ -24,9 +27,10 @@ module.exports = function() {
         });
 	};
 
-	System.prototype.yield = function(time) {
-		
-	};
+	System.prototype.wait = function(time_in_miliseconds) {
+		// insert wait string 
+		return util.format(constants.waitString, time_in_miliseconds);
+	}
 
 	return System;
 }

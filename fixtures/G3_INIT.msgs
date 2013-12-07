@@ -1,0 +1,6 @@
+# INIT
+Security: Captain, a small state vessel is approaching.
+<% avatar.setGlobal("red_alert", 0) %>
+<% avatar.addMessage("On screen", "G3_VESSEL_ON_SCREEN") %>
+<% avatar.addMessage("Hail vessel", "G3_HAIL") %>
+<% avatar.addMessage("Red alert", "G3_RED_ALERT") %>

@@ -15,47 +15,43 @@ function sleep(ms) {
     Fiber.yield();
 }
 
-function start() {
+function printLines(result) {
+    clearScreen();
+    
+    console.log(result);
+}
 
+function start() {
     // avatar is global
-    avatar = db.create('Avatar');
+    avatar = initAvatar();
 
     db.load('Message', {name: firstMessage}, function(err, message) {
         if (err) {
             console.log("ERROR in start:" + err);
         }
-        // end();
-        doLoop(message);
+        else {
+            message.run(avatar, function(err, result) {
+                
+                // show result of message
+                printLines(result);
+
+                //show command options
+                promptOptions(avatar.getCommandTextList(), '');
+            });
+        }
     })
 }
 
-
-function doLoop(message) {
-    if (message) {
-        var result = message.run(avatar, function(err, result) {
-            
-            // show result of message
-            console.log(result);
-
-            //show command options
-            promptOptions(avatar.getCommandTextList(), '');
-        });
-    }
+function initAvatar() {
+    return db.create('Avatar');
 }
 
-var printLines = Fiber(function(str) {
-    lines = str.split('\n');
-    for (i=0, ll=lines.length; i<ll; i++) {
-        console.log(lines[i]);
-        sleep(500);
-    }
-});
+
+function clearScreen() {
+    console.log("\033[2J\033[0f");
+}
 
 function promptOptions(options, currentChoice) {
-
-    // console.log(options);
-    // console.log(currentChoice);
-
     var currentOptions = options;
     if (currentChoice != '') {
         var choices = currentChoice.split('.');
@@ -74,7 +70,7 @@ function promptOptions(options, currentChoice) {
                     if (err) {
                         console.log(err);
                     }
-                    console.log(result);
+                    printLines(result);
                     promptOptions(avatar.getCommandTextList(), '');
                 });
                 return;
@@ -98,6 +94,13 @@ function promptOptions(options, currentChoice) {
         result = result + 'b) back' + '\n';
     }
     console.log(result);
+
+    //poll if necessary
+    // console.log(ship.getGlobal('yield'));
+    if (avatar.getGlobal('yield') === 1) {
+        pollForYield();
+    }
+
     rl.question('>', function(answer) {
         console.log('====================================');
         console.log('');
@@ -111,6 +114,26 @@ function promptOptions(options, currentChoice) {
             promptOptions(options, currentChoice);
         }
     });
+}
+
+function pollForYield() {
+    setTimeout(function() {
+        if (avatar.getGlobal('yield') === 1) {
+            avatar.pollForYield(function(err, result) {
+                if (err) {
+                    console.log(err);
+                }
+                if (result != false) {
+                    console.log('');
+                    console.log(result);
+                    promptOptions(avatar.getCommandTextList(), '');
+                }
+                else {
+                    pollForYield();
+                }
+            });
+        }
+    }, 1000);
 }
 
 function makeChildString(options, choices) {
@@ -148,6 +171,9 @@ function getStringArray(options) {
             if (childCount > 0) {
                 str = options[i].text + ' (' + childCount + ')';
             }
+            else {
+                str = options[i].text + ' -';
+            }
         }
         else {
             str = options[i].text;
@@ -172,6 +198,11 @@ function end() {
     rl.close();
 }
 
+// for subclasses to override with their own init stuff
+function init() {
+
+}
+
 module.exports = function() {
 
     // db and rl are global
@@ -182,7 +213,7 @@ module.exports = function() {
     Avatar = require('./models/Avatar')(db),
     Message = require('./models/Message')(db);
 
-    console.log('Welcome to argie!');
+    init();
 
     start();
 }();

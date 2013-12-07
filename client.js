@@ -17,8 +17,14 @@ function sleep(ms) {
 
 function printLines(result) {
     clearScreen();
-    
-    console.log(result);
+
+    if (result) {
+        var lines = result.split('\n');
+
+        for (var i = 0, ll = lines.length; i<ll; i++) {
+            console.log(lines[i]);
+        }
+    }
 }
 
 function start() {
@@ -59,20 +65,28 @@ function promptOptions(options, currentChoice) {
 
         for (var i=0, ll=choices.length; i<ll; i++) {
 
-            if (currentOptions[choices[i]].children) {
-                currentOptions = currentOptions[choices[i]].children;
-                // console.log(currentOptions);
+            if (currentOptions[choices[i]]) {
+                if (currentOptions[choices[i]].children) {
+                    currentOptions = currentOptions[choices[i]].children;
+                    // console.log(currentOptions);
+                }
+                else {
+                    var childString = makeChildString(options, choices)
+                    // console.log('cs'+childString);
+                    var result = avatar.runMessage(currentOptions[choices[i]].text, childString, function(err, result) {
+                        if (err) {
+                            console.log(err);
+                        }
+                        else {
+                            printLines(result);
+                        }
+                        promptOptions(avatar.getCommandTextList(), '');
+                    });
+                    return;
+                }
             }
             else {
-                var childString = makeChildString(options, choices)
-                // console.log('cs'+childString);
-                var result = avatar.runMessage(currentOptions[choices[i]].text, childString, function(err, result) {
-                    if (err) {
-                        console.log(err);
-                    }
-                    printLines(result);
-                    promptOptions(avatar.getCommandTextList(), '');
-                });
+                promptOptions(avatar.getCommandTextList(), '');
                 return;
             }
         }

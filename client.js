@@ -18,7 +18,6 @@ function sleep(miliseconds) {
 }
 
 function printLines(result, callback) {
-    clearScreen();
 
     if (result) {
         var lines = result.split('\n');

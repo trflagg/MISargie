@@ -32,5 +32,9 @@ module.exports = function() {
 		return util.format(constants.waitString, time_in_miliseconds);
 	}
 
+	System.prototype.clearScreen = function() {
+		return constants.clearScreenString
+	};
+
 	return System;
 }

@@ -80,6 +80,9 @@ module.exports = function(db, collectionName) {
     Message.prototype.messagesLoaded = function() {
         return this._messagesLoaded;
     }
+    Message.prototype.setMessagesLoaded = function(messagesLoaded) {
+        return this._messagesLoaded = messagesLoaded;
+    }
     Message.prototype.addLoadedMessage = function(message_id) {
         this._messagesLoaded.push(message_id);
     }

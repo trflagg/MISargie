@@ -8,11 +8,12 @@ module.exports = function() {
 	var util = require('util'),
 		constants = require('../constants');
 
-	System = function() {
+	System = function(avatar) {
 		this.loadedMessages = [];
+		this._avatar = avatar;
 	};
 
-	System.prototype.loadMessage = function(message_id, system, avatar) {
+	System.prototype.loadMessage = function(message_id) {
 		var msg = this.loadedMessages[message_id];
 		if (!msg) {
 			return 'MESSAGE ' + message_id + ' NOT FOUND. MAKE SURE TO INCLUDE IN LoadedMessages()';
@@ -22,8 +23,8 @@ module.exports = function() {
 			msg.compile();
 		}
 		return msg._compiled({
-        	avatar: avatar, 
-        	system: system
+        	avatar: this._avatar, 
+        	system: this
         });
 	};
 

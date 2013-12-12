@@ -19,10 +19,14 @@ module.exports = function() {
         fileEmitter = new EventEmitter(),
         messageList = [];
 
-    var saveMessage = function(messageName, messageText) {
+    var saveMessage = function(messageName, messageText, loadedMessages) {
         var newMessage = db.create('Message');
         newMessage.setName(messageName);
         newMessage.setText(messageText);
+
+        if (loadedMessages.length > 0) {
+            newMessage.setMessagesLoaded(loadedMessages);
+        }
         newMessage.compile();
         console.log(messageName);
         db.save('Message', newMessage);
@@ -47,6 +51,7 @@ module.exports = function() {
             lines = data.split('\n');
             // take off '# '
             var messageName = /^# (\w+)/.exec(lines[0])[1];
+            var loadedMessages = [];
 
             // read line by line
             var text = '';
@@ -54,19 +59,24 @@ module.exports = function() {
                 var line = lines[i];
 
                 if (line[0] === "#") {
-                    if (line == '#--') {
+                    if (line.indexOf('# loadMessage(') == 0) {
+                        var loadName = /^# loadMessage\(\'(\w+)\'\)/.exec(line)[1];
+                        loadedMessages.push(loadName);
+                    }
+                    else if (line == '#--') {
                         // new message
-                        saveMessage(messageName, text);
+                        saveMessage(messageName, text, loadedMessages);
                         text = '';
                         i++;
                         var messageName = /^# (\w+)/.exec(lines[i])[1];
+                        var loadedMessages = [];
                     }
                 } else {
                     text = text + '\n' + line;
                 }
             }
 
-            saveMessage(messageName, text);
+            saveMessage(messageName, text, loadedMessages);
         }
         else {
             // take off extension

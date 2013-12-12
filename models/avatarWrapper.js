@@ -34,6 +34,13 @@ module.exports = function() {
 		this.avatar.addBNum(name, amount);
 	};
 
+	AvatarWrapper.prototype.hideChild = function(childName) {
+		this.avatar.hideChild(childName);
+	}
+	AvatarWrapper.prototype.showChild = function(childName) {
+		this.avatar.showChild(childName);
+	}
+
 
 	return AvatarWrapper;
 }

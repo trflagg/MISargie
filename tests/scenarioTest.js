@@ -90,7 +90,6 @@ module.exports = function(db, callback) {
                     assert.equal(result, 'A suspicious ship approaches.\n');
                     assert.equal(picard.getCommandTextList()[0].text, 'Hail Ship');
                     assert.equal(picard.getCommandTextList()[1].text, 'Red Alert');
-
                     // user decides to go on red alert.
                     picard.runMessage('Red Alert', function(err, result) {
                         assert.equal(err, null, err);
@@ -104,6 +103,10 @@ module.exports = function(db, callback) {
             assert.equal(result, 'The ships reverses thrust and comes to a complete halt. It hails you.\n');
             assert.equal(picard.getCommandTextList()[0].text, 'Respond to hail');
             assert.equal(picard.child('ship').child('weapons').getCommandTextList()[0].text, 'Ready weapons');
+            assert.equal(picard.child('ship').getCommandTextList().length, 2);
+            picard.hideChild('ship.weapons');
+            assert.equal(picard.child('ship').getCommandTextList().length, 1);
+            picard.showChild('ship.weapons');
             assert.equal(picard.getCommandTextList()[1].text, 'Shields up');
 
             // user responds shields up
@@ -115,7 +118,7 @@ module.exports = function(db, callback) {
 
         function(picard, result, callback) {
             assert.equal(result, 'Alarms go off signaling that the enemy vessel has readied its weapons.\n' +
-                    util.format(constants.waitString,1) +
+                    util.format(constants.waitString,1000) +
                     '\nLasers strike from the front of the enemy ship, but they disintegrate in the shield.\n ');
             // test waitRegEx
             assert(constants.waitRegEx.test(result.split('\n')[1]));

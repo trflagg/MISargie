@@ -127,7 +127,6 @@ function promptOptions(options, currentChoice) {
     }
 
     rl.question('>', function(answer) {
-        console.log('====================================');
         console.log('');
         if (answer === 'b') {
             promptOptions(options, currentChoice.split('.').slice(0,-1).join('.'));

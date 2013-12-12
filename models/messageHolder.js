@@ -8,7 +8,8 @@ module.exports = function(db, collectionName) {
         if (doc) {
             // load from doc
             this._messages = doc._messages;
-            this._newMessageText = doc._newMessageText
+            this._newMessageText = doc._newMessageText;
+            this._hidden = doc._hidden;
 
             // make a new messageHolder object for every child in doc
             this._children = {};
@@ -23,6 +24,7 @@ module.exports = function(db, collectionName) {
             this._messages = {};
             this._children = {};
             this._newMessageText = null;
+            this._hidden = false;
         }
     }
     util.inherits(MessageHolder, Model);
@@ -33,6 +35,7 @@ module.exports = function(db, collectionName) {
         doc._messages = messageHolder._messages;
         doc._children = messageHolder._children;
         doc._newMessageText = messageHolder._newMessageText;
+        doc._hidden = messageHolder._hidden;
 
         return doc;
     }
@@ -45,6 +48,28 @@ module.exports = function(db, collectionName) {
     }
     MessageHolder.prototype.child = function(name) {
         return this._children[name];
+    }
+    MessageHolder.prototype.hideChild = function(child) {
+        if (child) {
+            // childArray[1] = first item of dot-separated children
+            // childArray[2] = rest of the string (minus the dot)
+            var childArray = /(\w+)(?:\.([\w.]+))*/.exec(child);
+            return this.child(childArray[1]).hideChild(childArray[2]);
+        }
+        else {
+            this.hide();
+        }
+    }
+    MessageHolder.prototype.showChild = function(child) {
+        if (child) {
+            // childArray[1] = first item of dot-separated children
+            // childArray[2] = rest of the string (minus the dot)
+            var childArray = /(\w+)(?:\.([\w.]+))*/.exec(child);
+            return this.child(childArray[1]).showChild(childArray[2]);
+        }
+        else {
+            this.show()
+        }
     }
 
     MessageHolder.prototype.setNewMessageText = function(text) {
@@ -107,6 +132,9 @@ module.exports = function(db, collectionName) {
         return Object.keys(this._messages).length;
     };
     MessageHolder.prototype.getCommandTextList = function() {
+        if (this._hidden) {
+            return null;
+        }
         var list = [];
         var keys = Object.keys(this._messages);
         for (var i =0, ll=keys.length; i<ll; i++) {
@@ -122,7 +150,9 @@ module.exports = function(db, collectionName) {
                 obj.text = childName
                 obj.children = this._children[childName].getCommandTextList();
 
-                list.push(obj);
+                if (obj.children) {
+                    list.push(obj);
+                }
             }
         }
         return list;
@@ -136,6 +166,13 @@ module.exports = function(db, collectionName) {
             }
         }
     }
+
+    MessageHolder.prototype.hide = function() {
+        this._hidden = true;
+    };
+    MessageHolder.prototype.show = function() {
+        this._hidden = false;
+    };
 
     MessageHolder.prototype.toObject = function() {
         var messages = this._messages,

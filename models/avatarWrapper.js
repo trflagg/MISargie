@@ -48,6 +48,10 @@ module.exports = function() {
 		this.avatar.showChild(childName);
 	}
 
+	AvatarWrapper.prototype.clearMessages = function() {
+		this.avatar.clear();
+	}
+
 
 	return AvatarWrapper;
 }();

@@ -139,8 +139,8 @@ module.exports = function(db, collectionName) {
     Avatar.prototype.getYieldTime = function() {
         return this._yieldTime;
     }
-    Avatar.prototype.setYieldMessage = function(message_id) {
-        this._yieldMessage = message_id;
+    Avatar.prototype.setYieldMessage = function(messageName) {
+        this._yieldMessage = messageName;
     }
     Avatar.prototype.getYieldMessage = function() {
         return this._yieldMessage;

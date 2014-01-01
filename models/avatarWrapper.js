@@ -52,6 +52,13 @@ module.exports = function() {
 		this.avatar.clear();
 	}
 
+	AvatarWrapper.prototype.addTrigger = function(messageName) {
+		this.avatar.addTrigger(messageName);
+	};
+	AvatarWrapper.prototype.removeTrigger = function(messageName) {
+		this.avatar.removeTrigger(messageName);
+	};
+
 
 	return AvatarWrapper;
 }();

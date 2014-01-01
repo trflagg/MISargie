@@ -202,6 +202,38 @@ module.exports = function(db, callback) {
                     console.log("created scenario.");
                     callback(err)
                 });
+            },
+
+            // make test triggers
+            function(callback) {
+                var m1 = db.create('Message');
+                m1.setName('G2_TRIGGER_1');
+                m1.setText('Trigger!\n' +
+                    '<% if (avatar.getGlobal("addTrigger") == 1) {%>' +
+                        '<% avatar.addTrigger("G2_TRIGGER_2") %>' +
+                        '<% avatar.removeTrigger("G2_TRIGGER_1") %>' +
+                        'add trigger!\n' +
+                    '<% } %>');
+                m1.compile();
+                db.save('Message', m1, function(err) {
+                    callback(err);
+                });
+            },
+
+            // make test triggers
+            function(callback) {
+                var m1 = db.create('Message');
+                m1.setName('G2_TRIGGER_2');
+                m1.addLoadedMessage("G2_LOC_NEUTRAL_ZONE");
+                m1.setText('Trigger 2!\n' +
+                    '<% if (avatar.getGlobal("addTrigger") == 2) {%>' +
+                        '<%= system.loadMessage("G2_LOC_NEUTRAL_ZONE") %>' +
+                        '<% avatar.removeTrigger("G2_TRIGGER_2") %>' +
+                    '<% } %>');
+                m1.compile();
+                db.save('Message', m1, function(err) {
+                    callback(err);
+                });
             }
 
 

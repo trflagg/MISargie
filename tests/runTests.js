@@ -35,6 +35,10 @@ module.exports.runTests = function() {
             },
             function(callback) {
                 console.log('');
+                require('./triggerTest')(db, callback);
+            },
+            function(callback) {
+                console.log('');
                 require('./scenarioTest')(db, callback);
             }
         ],

@@ -1,6 +1,8 @@
 module.exports = function(db, collectionName) {
 
     var util = require('util'),
+        sugar = require('sugar'),
+        async = require('async'),
         codeHandler = require('./codeHandler'),
         MessageHolder = require('./messageHolder')(db),
         returnObject = {},
@@ -24,6 +26,8 @@ module.exports = function(db, collectionName) {
             }
             this._yieldTime = doc.yieldTimer;
             this._yieldMessage = doc.yieldMessage;
+            this._triggers = doc.triggers;
+
         }
         else 
         {
@@ -33,6 +37,7 @@ module.exports = function(db, collectionName) {
             this._bNums = {};
             this._yieldTime = null;
             this._yieldMessage = null;
+            this._triggers = [];
         }
     }
     util.inherits(Avatar, MessageHolder);
@@ -52,6 +57,8 @@ module.exports = function(db, collectionName) {
         }
         doc.yieldTime = avatar._yieldTime;
         doc.yieldMessage = avatar._yieldMessage;
+        doc.triggers = avatar._triggers;
+
         return doc;
     };
 
@@ -162,6 +169,13 @@ module.exports = function(db, collectionName) {
         callback(null, false);
     }
 
+    Avatar.prototype.addTrigger = function(messageName) {
+        this._triggers.push(messageName);
+    };
+    Avatar.prototype.removeTrigger = function(messageName) {
+        this._triggers.remove(messageName);
+    };
+
     Avatar.prototype.runMessage = function(commandText, child, callback) {
         // make child optional
         if (typeof child === 'function') {
@@ -169,17 +183,62 @@ module.exports = function(db, collectionName) {
             child = '';
         }
 
+        // triggers
+        var messageList = this._triggers.clone();
+
+        // message being run
         var messageName = this.message(commandText, child);
+        messageList.push(messageName);
+
         //callback variable
         var avatar = this;
-        db.load('Message', {name: messageName}, function(err, message) {
+
+        // load & run
+        db.loadMultiple('Message', {name: { $in: messageList}}, function(err, messages) {
             if (err) {
                 return callback(err, null);
             }
+            var triggers = [];
+            var message = {};
+            for (var i=0,ll=messages.length; i<ll; i++) {
+                if (messages[i].getName() == messageName) {
+                    message = messages[i];
+                }
+                else {
+                    triggers.push(messages[i]);
+                }
+            }
+
             if (message.autoRemove()) {
                 avatar.removeMessage(commandText)
             }
-            var result = message.run(avatar, callback);
+
+            message.run(avatar, function(err, result) {
+                if (err) {
+                    return callback(err, null);
+                }
+
+                avatar._runTriggerList(triggers, result, callback);
+            });
+        });
+
+    };
+
+    Avatar.prototype._runTriggerList = function(triggers, result, callback) {
+
+        // closure variable
+        var avatar = this;
+
+        // run each trigger
+        async.concatSeries(triggers, function(triggerMessage, callback) {
+            triggerMessage.run(avatar, function(err, trigger_result) {
+                callback(err, trigger_result);
+            });
+        },
+        // end function 
+        function(err, results) {
+            result = result + results.join('');
+            callback(null, result);
         });
 
     };

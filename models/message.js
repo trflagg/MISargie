@@ -139,7 +139,7 @@ module.exports = function(db, collectionName) {
         else {
             // kick it off
             result = this._compiled({
-                            avatar: avatar, 
+                            avatar: avatarWrapper, 
                             system: system
                         })
             callback(null, result);

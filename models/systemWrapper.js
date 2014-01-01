@@ -6,7 +6,8 @@
 module.exports = function() {
 
 	var util = require('util'),
-		constants = require('../constants');
+		constants = require('../constants'),
+		AvatarWrapper = require('./avatarWrapper');
 
 	System = function(avatar) {
 		this.loadedMessages = [];
@@ -22,8 +23,9 @@ module.exports = function() {
 		if (!msg._compiled) {
 			msg.compile();
 		}
+		var avatarWrapper = new AvatarWrapper(this._avatar);
 		return msg._compiled({
-        	avatar: this._avatar, 
+        	avatar: avatarWrapper, 
         	system: this
         });
 	};
@@ -38,4 +40,4 @@ module.exports = function() {
 	};
 
 	return System;
-}
+}();

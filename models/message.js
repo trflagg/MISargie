@@ -4,8 +4,8 @@ module.exports = function(db, collectionName) {
         underscore = require('underscore'),
         Model = require('../argieDb/model')(db),
         Nodes = require('./Nodes'),
-        System = require('./systemWrapper')(),
-        AvatarWrapper = require('./avatarWrapper')(),
+        System = require('./systemWrapper'),
+        AvatarWrapper = require('./avatarWrapper'),
         collectionName = collectionName || 'messages';
 
 

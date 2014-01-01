@@ -34,6 +34,13 @@ module.exports = function() {
 		this.avatar.addBNum(name, amount);
 	};
 
+	AvatarWrapper.prototype.addMessage = function(commandText, messageName, child) {
+		this.avatar.addMessage(commandText, messageName, child);
+	};
+	AvatarWrapper.prototype.removeMessage = function(commandText) {
+		this.avatar.removeMessage(commandText);
+	};
+
 	AvatarWrapper.prototype.hideChild = function(childName) {
 		this.avatar.hideChild(childName);
 	}
@@ -43,4 +50,4 @@ module.exports = function() {
 
 
 	return AvatarWrapper;
-}
+}();

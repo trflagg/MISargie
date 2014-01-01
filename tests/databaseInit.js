@@ -192,10 +192,10 @@ module.exports = function(db, callback) {
                         '<% avatar.addMessage("Fire weapons", "G2_FIRE") %>' +
                     '<% } %>' +
                     '<% if(avatar.getGlobal("response") == 0) { %>' +
-                        'The gargling noise transmitted from the enemy ship gets much louder.' +
-                        'Gargling voice: Do you surrender?' +
-                        '<% avatar.addMessage(Yes, G2_SURRENDER) %>' +
-                        '<% avatar.addMessage(No, G2_No_SURRENDER) %>' +
+                        'The gargling noise transmitted from the enemy ship gets much louder.\n' +
+                        'Gargling voice: Do you surrender?\n' +
+                        '<% avatar.addMessage("Yes", "G2_SURRENDER") %>' +
+                        '<% avatar.addMessage("No", "G2_No_SURRENDER") %>' +
                     '<% } %>');
                 m1.compile();
                 db.save('Message', m1, function(err) {

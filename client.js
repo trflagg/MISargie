@@ -31,6 +31,10 @@ function printLines(result, callback) {
                 // wait in the worst way possible
                 sleep(regExArray[1])
             }
+            // check for clearScreen string
+            else if ((regExArray = constants.clearScreenRegEx.exec(currentLine)) != null) {
+                clearScreen();
+            }
             else {
                 console.log(currentLine);
             }

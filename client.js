@@ -113,7 +113,8 @@ function promptOptions(options, currentChoice) {
 
     var result = '';
     for (var i = 0, length = optionString.length; i<length; i++) {
-       result = result + i + ') ' + optionString[i] + '\n';
+        // (i+1) because client starts at 1 instead of 0
+       result = result + (i+1) + ') ' + optionString[i] + '\n';
     }
     if (optionString.length === 0) {
         result = result + 'No options available.' + '\n';
@@ -175,13 +176,21 @@ function makeChildString(options, choices) {
 }
 
 function addChoice(currentChoice, newChoice) {
-    if (currentChoice != '') {
-        currentChoice = currentChoice + '.' + newChoice;
-    }
-    else {
-        currentChoice = newChoice;
-    }
+    if (!isNaN(newChoice)) {
 
+        // because client starts at 1 instead of 0
+        newChoice = new String(newChoice - 1);
+
+        // do we already have a choice?
+        if (currentChoice != '') {
+            // add to the end
+            currentChoice = currentChoice + '.' + newChoice;
+        }
+        else {
+            // select first choice
+            currentChoice = newChoice;
+        }
+    }
     return currentChoice;
 }
 

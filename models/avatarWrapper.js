@@ -12,7 +12,7 @@ module.exports = function() {
 	}
 
 	AvatarWrapper.prototype.setGlobal = function(global, value) {
-		this.avatar.setGlobal(global, value);
+		return this.avatar.setGlobal(global, value);
 	};
 	AvatarWrapper.prototype.getGlobal = function(global) {
 		return this.avatar.getGlobal(global);
@@ -21,31 +21,31 @@ module.exports = function() {
 	AvatarWrapper.prototype.yield = function(time, message_id) {
         this.avatar.setGlobal('yield', 1);
 		this.avatar.setYieldTime(time);
-		this.avatar.setYieldMessage(message_id);
+		return this.avatar.setYieldMessage(message_id);
 	}
 
 	AvatarWrapper.prototype.setBNum = function(name, value) {
-		this.avatar.setBNum(name, value);
+		return this.avatar.setBNum(name, value);
 	}
 	AvatarWrapper.prototype.getBNum = function(name) {
 		return this.avatar.getBNum(name);
 	};
 	AvatarWrapper.prototype.addBNum = function(name, amount) {
-		this.avatar.addBNum(name, amount);
+		return this.avatar.addBNum(name, amount);
 	};
 
 	AvatarWrapper.prototype.addMessage = function(commandText, messageName, child) {
-		this.avatar.addMessage(commandText, messageName, child);
+		return this.avatar.addMessage(commandText, messageName, child);
 	};
 	AvatarWrapper.prototype.removeMessage = function(commandText) {
-		this.avatar.removeMessage(commandText);
+		return this.avatar.removeMessage(commandText);
 	};
 
 	AvatarWrapper.prototype.hideChild = function(childName) {
-		this.avatar.hideChild(childName);
+		return this.avatar.hideChild(childName);
 	}
 	AvatarWrapper.prototype.showChild = function(childName) {
-		this.avatar.showChild(childName);
+		return this.avatar.showChild(childName);
 	}
 
 	AvatarWrapper.prototype.clearMessages = function() {
@@ -53,10 +53,10 @@ module.exports = function() {
 	}
 
 	AvatarWrapper.prototype.addTrigger = function(messageName) {
-		this.avatar.addTrigger(messageName);
+		return this.avatar.addTrigger(messageName);
 	};
 	AvatarWrapper.prototype.removeTrigger = function(messageName) {
-		this.avatar.removeTrigger(messageName);
+		return this.avatar.removeTrigger(messageName);
 	};
 
 

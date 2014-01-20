@@ -200,13 +200,19 @@ module.exports = function(db, collectionName) {
             }
             var triggers = [];
             var message = {};
+            var foundMessage = false;
             for (var i=0,ll=messages.length; i<ll; i++) {
                 if (messages[i].getName() == messageName) {
                     message = messages[i];
+                    foundMessage = true;
                 }
                 else {
                     triggers.push(messages[i]);
                 }
+            }
+
+            if (!foundMessage) {
+                return callback('Message ' + 'messageName' + ' NOT FOUND.', null);
             }
 
             if (message.autoRemove()) {

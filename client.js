@@ -138,8 +138,12 @@ function promptOptions(options, currentChoice) {
         }
         else if (!handleOptions(answer)) {
             console.log('');
-            currentChoice = addChoice(currentChoice, answer);
-
+            if (!isNaN(answer)) {
+                // because client starts at 1 instead of 0
+                answer = new String(answer - 1);
+                currentChoice = addChoice(currentChoice, answer);
+            }
+            
             promptOptions(options, currentChoice);
         }
     });

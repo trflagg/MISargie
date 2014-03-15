@@ -5,6 +5,7 @@ module.exports = function(db, collectionName) {
         async = require('async'),
         codeHandler = require('./codeHandler'),
         MessageHolder = require('./messageHolder')(db),
+        BNum = require('./bNum')(db),
         returnObject = {},
         collectionName = collectionName || 'avatars';
 
@@ -87,6 +88,10 @@ module.exports = function(db, collectionName) {
     };
 
     Avatar.prototype.setBNum = function(key, value, callback) {
+        if (!isNaN(value)) {
+            value = db.create('bNum').setValue(value);
+        }
+
         this._bNums[key] = value;
 
         if (typeof callback === 'function') {
@@ -212,7 +217,7 @@ module.exports = function(db, collectionName) {
             }
 
             if (!foundMessage) {
-                return callback('Message ' + 'messageName' + ' NOT FOUND.', null);
+                return callback('Message ' + messageName + ' NOT FOUND.', null);
             }
 
             if (message.autoRemove()) {

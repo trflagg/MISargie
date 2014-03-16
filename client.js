@@ -3,7 +3,7 @@ var firstMessage = 'INIT';
 
 var environment = require('./environments/environment-local'),
     readline = require('readline'),
-    Db = require('./argieDb/db'),
+    Db = require('argieDb/db'),
     constants = require('./constants');
 
 

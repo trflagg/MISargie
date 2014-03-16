@@ -10,7 +10,8 @@
     "async": "0.2.9",
     "mongoskin": "0.5.0",
     "underscore": "~1.5.2",
-    "sugar": "~1.4.1"
+    "sugar": "~1.4.1",
+    "argieDb": "*"
   },
   "repository": {
     "type": "git",

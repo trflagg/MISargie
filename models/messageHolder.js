@@ -9,7 +9,7 @@ module.exports = function(db, collectionName) {
             // load from doc
             this._messages = doc._messages;
             this._newMessageText = doc._newMessageText;
-            this._hidden = doc._hidden;
+            this._visible = doc._visible;
 
             // make a new messageHolder object for every child in doc
             this._children = {};
@@ -24,7 +24,7 @@ module.exports = function(db, collectionName) {
             this._messages = {};
             this._children = {};
             this._newMessageText = null;
-            this._hidden = false;
+            this._visible = true;
         }
     }
     util.inherits(MessageHolder, Model);
@@ -35,7 +35,7 @@ module.exports = function(db, collectionName) {
         doc._messages = messageHolder._messages;
         doc._children = messageHolder._children;
         doc._newMessageText = messageHolder._newMessageText;
-        doc._hidden = messageHolder._hidden;
+        doc._visible = messageHolder._visible;
 
         return doc;
     }
@@ -132,7 +132,7 @@ module.exports = function(db, collectionName) {
         return Object.keys(this._messages).length;
     };
     MessageHolder.prototype.getCommandTextList = function() {
-        if (this._hidden) {
+        if (!this._visible) {
             return null;
         }
         var list = [];
@@ -149,7 +149,7 @@ module.exports = function(db, collectionName) {
                 obj.childMessageCount = this._children[childName].childMessageCount();
                 obj.text = childName
                 obj.children = this._children[childName].getCommandTextList();
-
+                obj.visible = this._visible;
                 if (obj.children) {
                     list.push(obj);
                 }
@@ -168,10 +168,10 @@ module.exports = function(db, collectionName) {
     }
 
     MessageHolder.prototype.hide = function() {
-        this._hidden = true;
+        this._visible = false;
     };
     MessageHolder.prototype.show = function() {
-        this._hidden = false;
+        this._visible = true;
     };
 
     MessageHolder.prototype.toObject = function() {

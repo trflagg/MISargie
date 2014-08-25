@@ -11,54 +11,55 @@ module.exports = function(db, collectionName) {
 
     Avatar = function(doc) {
         Avatar.super_.call(this, doc);
-
-        if (doc) {
-            // load from doc
-            this._name = doc.name;
-            this._location = doc.location;
-            this._globals = doc.globals;
-            this._bNums = {};
-            for (key in doc.bNums) {
-                if (doc.bNums.hasOwnProperty(key)) {
-                    var constructor = db.getConstructor('bNum');
-                    var bNum = new constructor(doc.bNums[key]);
-                    this.setBNum(key, bNum);
-                }
-            }
-            this._yieldTime = doc.yieldTimer;
-            this._yieldMessage = doc.yieldMessage;
-            this._triggers = doc.triggers;
-
-        }
-        else 
-        {
-            // new avatar
-            this._location = null;
-            this._globals = {};
-            this._bNums = {};
-            this._yieldTime = null;
-            this._yieldMessage = null;
-            this._triggers = [];
-        }
     }
     util.inherits(Avatar, MessageHolder);
 
-    Avatar.prototype.onSave = function(avatar) {
-        var doc = Avatar.super_.prototype.onSave(avatar);
+    Avatar.prototype.initialize = function() {
+        Avatar.super_.prototype.initialize.call(this);
 
-        doc.name = avatar._name;
-        doc.location = avatar._location;
-        doc.globals = avatar._globals;
+        this._location = null;
+        this._globals = {};
+        this._bNums = {};
+        this._yieldTime = null;
+        this._yieldMessage = null;
+        this._triggers = [];
+    };
+
+    Avatar.prototype.loadFromDoc = function(doc) {
+        Avatar.super_.prototype.loadFromDoc.call(this, doc);
+
+        this._name = doc.name;
+        this._location = doc.location;
+        this._globals = doc.globals;
+        this._bNums = {};
+        for (key in doc.bNums) {
+            if (doc.bNums.hasOwnProperty(key)) {
+                var constructor = db.getConstructor('bNum');
+                var bNum = new constructor(doc.bNums[key]);
+                this.setBNum(key, bNum);
+            }
+        }
+        this._yieldTime = doc.yieldTimer;
+        this._yieldMessage = doc.yieldMessage;
+        this._triggers = doc.triggers;
+    };
+
+    Avatar.prototype.saveToDoc = function(doc) {
+        Avatar.super_.prototype.saveToDoc.call(this, doc);
+
+        doc.name = this._name;
+        doc.location = this._location;
+        doc.globals = this._globals;
         doc.bNums = {};
-        for (key in avatar._bNums) {
-            if (avatar._bNums.hasOwnProperty(key)) {
-                var bNum = avatar._bNums[key];
+        for (key in this._bNums) {
+            if (this._bNums.hasOwnProperty(key)) {
+                var bNum = this._bNums[key];
                 doc.bNums[key] = bNum.onSave(bNum);
             }
         }
-        doc.yieldTime = avatar._yieldTime;
-        doc.yieldMessage = avatar._yieldMessage;
-        doc.triggers = avatar._triggers;
+        doc.yieldTime = this._yieldTime;
+        doc.yieldMessage = this._yieldMessage;
+        doc.triggers = this._triggers;
 
         return doc;
     };
@@ -139,7 +140,7 @@ module.exports = function(db, collectionName) {
                 }
                 var result = message.run(avatar, callback);
             });
-            
+
         })
     };
 
@@ -246,7 +247,7 @@ module.exports = function(db, collectionName) {
                 callback(err, trigger_result);
             });
         },
-        // end function 
+        // end function
         function(err, results) {
             result = result + results.join('');
             callback(null, result);
@@ -257,5 +258,5 @@ module.exports = function(db, collectionName) {
     db.register('Avatar', Avatar);
 
     return Avatar;
-        
+
 };

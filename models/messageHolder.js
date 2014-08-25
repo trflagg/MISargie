@@ -4,38 +4,41 @@ module.exports = function(db, collectionName) {
 
     MessageHolder = function(doc) {
         MessageHolder.super_.call(this, doc);
-
-        if (doc) {
-            // load from doc
-            this._messages = doc._messages;
-            this._newMessageText = doc._newMessageText;
-            this._visible = doc._visible;
-
-            // make a new messageHolder object for every child in doc
-            this._children = {};
-            for (var child in doc._children) {
-                if (doc._children.hasOwnProperty(child)) {
-                    this._children[child] = new MessageHolder(doc._children[child]);
-                }
-            }
-        }
-        else {
-            // create new
-            this._messages = {};
-            this._children = {};
-            this._newMessageText = null;
-            this._visible = true;
-        }
     }
     util.inherits(MessageHolder, Model);
 
-    MessageHolder.prototype.onSave = function(messageHolder) {
-        var doc = MessageHolder.super_.prototype.onSave(messageHolder);
+    MessageHolder.prototype.initialize = function() {
+        MessageHolder.super_.prototype.initialize.call(this);
 
-        doc._messages = messageHolder._messages;
-        doc._children = messageHolder._children;
-        doc._newMessageText = messageHolder._newMessageText;
-        doc._visible = messageHolder._visible;
+        this._messages = {};
+        this._children = {};
+        this._newMessageText = null;
+        this._visible = true;
+    }
+
+    MessageHolder.prototype.loadFromDoc = function(doc) {
+        MessageHolder.super_.prototype.loadFromDoc.call(this, doc);
+
+        this._messages = doc._messages;
+        this._newMessageText = doc._newMessageText;
+        this._visible = doc._visible;
+
+        // make a new messageHolder object for every child in doc
+        this._children = {};
+        for (var child in doc._children) {
+            if (doc._children.hasOwnProperty(child)) {
+                this._children[child] = new MessageHolder(doc._children[child]);
+            }
+        }
+    };
+
+    MessageHolder.prototype.saveToDoc = function(doc) {
+        MessageHolder.super_.prototype.saveToDoc.call(this, doc);
+
+        doc._messages = this._messages;
+        doc._children = this._children;
+        doc._newMessageText = this._newMessageText;
+        doc._visible = this._visible;
 
         return doc;
     }
@@ -84,7 +87,7 @@ module.exports = function(db, collectionName) {
             return this.child(childArray[1]).addMessage(commandText, messageName, childArray[2]);
         }
         else {
-            this._messages[commandText] = messageName;   
+            this._messages[commandText] = messageName;
             if (this._newMessageText) {
                 return this._newMessageText.replace(/(%s)/,commandText);
             }

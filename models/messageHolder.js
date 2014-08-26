@@ -19,15 +19,17 @@ module.exports = function(db, collectionName) {
     MessageHolder.prototype.loadFromDoc = function(doc) {
         MessageHolder.super_.prototype.loadFromDoc.call(this, doc);
 
-        this._messages = doc._messages;
-        this._newMessageText = doc._newMessageText;
-        this._visible = doc._visible;
+        if(doc._messages) this._messages = doc._messages;
+        if(doc._newMessageText) this._newMessageText = doc._newMessageText;
+        if(doc._visible) this._visible = doc._visible;
 
         // make a new messageHolder object for every child in doc
-        this._children = {};
-        for (var child in doc._children) {
-            if (doc._children.hasOwnProperty(child)) {
-                this._children[child] = new MessageHolder(doc._children[child]);
+        if (doc._children) {
+            this._children = {};
+            for (var child in doc._children) {
+                if (doc._children.hasOwnProperty(child)) {
+                    this._children[child] = new MessageHolder(doc._children[child]);
+                }
             }
         }
     };

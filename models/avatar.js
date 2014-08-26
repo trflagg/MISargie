@@ -28,20 +28,22 @@ module.exports = function(db, collectionName) {
     Avatar.prototype.loadFromDoc = function(doc) {
         Avatar.super_.prototype.loadFromDoc.call(this, doc);
 
-        this._name = doc.name;
-        this._location = doc.location;
-        this._globals = doc.globals;
-        this._bNums = {};
-        for (key in doc.bNums) {
-            if (doc.bNums.hasOwnProperty(key)) {
-                var constructor = db.getConstructor('bNum');
-                var bNum = new constructor(doc.bNums[key]);
-                this.setBNum(key, bNum);
+        if(doc.name) this._name = doc.name;
+        if(doc.location) this._location = doc.location;
+        if(doc.globals) this._globals = doc.globals;
+        if(doc.bNums) {
+            this._bNums = {};
+            for (key in doc.bNums) {
+                if (doc.bNums.hasOwnProperty(key)) {
+                    var constructor = db.getConstructor('bNum');
+                    var bNum = new constructor(doc.bNums[key]);
+                    this.setBNum(key, bNum);
+                }
             }
         }
-        this._yieldTime = doc.yieldTimer;
-        this._yieldMessage = doc.yieldMessage;
-        this._triggers = doc.triggers;
+        if(doc.yieldTime) this._yieldTime = doc.yieldTimer;
+        if(doc.yieldMessage) this._yieldMessage = doc.yieldMessage;
+        if(doc.triggers) this._triggers = doc.triggers;
     };
 
     Avatar.prototype.saveToDoc = function(doc) {

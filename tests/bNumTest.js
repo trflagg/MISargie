@@ -38,7 +38,7 @@ module.exports = function(db, callback) {
 
         // test avatar.setBNum()
         function(callback) {
-            db.load('Avatar', {name: 'Joe'}, function(err, avatar) {
+            db.load('Avatar', {_name: 'Joe'}, function(err, avatar) {
                 assert.notEqual(avatar, null);
                 avatar.setBNum('bNumTest', db.create('bNum').setValue(0.5));
                 avatar.setBNum('bNumTest-2', db.create('bNum').setValue(-0.756));
@@ -51,7 +51,7 @@ module.exports = function(db, callback) {
 
         // test avatar.addBNum()
         function(callback) {
-            db.load('Avatar', {name: 'Joe'}, function(err, avatar) {
+            db.load('Avatar', {_name: 'Joe'}, function(err, avatar) {
                 var bNum = avatar.getBNum('bNumTest');
                 assert.equal(bNum.getValue(), 0.5);
                 assert.equal(avatar.getBNum('bNumTest-2').getValue(), -0.756);

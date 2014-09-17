@@ -28,7 +28,6 @@ module.exports = function(db, collectionName) {
     Avatar.prototype.loadFromDoc = function(doc) {
         Avatar.super_.prototype.loadFromDoc.call(this, doc);
 
-        if(doc.name) this._name = doc.name;
         if(doc.location) this._location = doc.location;
         if(doc.globals) this._globals = doc.globals;
         if(doc.bNums) {
@@ -49,7 +48,6 @@ module.exports = function(db, collectionName) {
     Avatar.prototype.saveToDoc = function(doc) {
         Avatar.super_.prototype.saveToDoc.call(this, doc);
 
-        doc.name = this._name;
         doc.location = this._location;
         doc.globals = this._globals;
         doc.bNums = {};
@@ -65,13 +63,6 @@ module.exports = function(db, collectionName) {
 
         return doc;
     };
-
-    Avatar.prototype.setName = function(name) {
-        this._name = name;
-    }
-    Avatar.prototype.getName = function() {
-        return this._name;
-    }
 
     Avatar.prototype.setGlobal = function(key, value, callback) {
         this._globals[key] = value;

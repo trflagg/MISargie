@@ -3,7 +3,7 @@ module.exports = function(db, callback) {
 
     var async = require('async'),
         assert = require('assert'),
-        Avatar = require('../models/Avatar')(db);   
+        Avatar = require('../models/Avatar')(db);
 
     console.log('_ Begin avatarTest ___');
 
@@ -14,14 +14,14 @@ module.exports = function(db, callback) {
             avatar.setGlobal('level', 1);
             db.save('Avatar', avatar, function(error) {
                 assert.equal(error, null, error);
-
                 callback(null);
             });
         },
 
         function(callback) {
-            db.load('Avatar',{name: 'Joe'}, function(error, avatar) {
+            db.load('Avatar',{_name: 'Joe'}, function(error, avatar) {
                 assert.equal(error, null);
+                console.dir(avatar);
                 assert.equal(avatar.getName(), 'Joe');
                 assert.equal(avatar.getGlobal('level'), 1);
                 avatar.setGlobal('something', 2);

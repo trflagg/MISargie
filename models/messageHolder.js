@@ -19,6 +19,7 @@ module.exports = function(db, collectionName) {
     MessageHolder.prototype.loadFromDoc = function(doc) {
         MessageHolder.super_.prototype.loadFromDoc.call(this, doc);
 
+        if(doc._name) this._name = doc._name;
         if(doc._messages) this._messages = doc._messages;
         if(doc._newMessageText) this._newMessageText = doc._newMessageText;
         if(doc._visible) this._visible = doc._visible;
@@ -37,12 +38,20 @@ module.exports = function(db, collectionName) {
     MessageHolder.prototype.saveToDoc = function(doc) {
         MessageHolder.super_.prototype.saveToDoc.call(this, doc);
 
+        doc._name = this._name;
         doc._messages = this._messages;
         doc._children = this._children;
         doc._newMessageText = this._newMessageText;
         doc._visible = this._visible;
 
         return doc;
+    }
+
+    MessageHolder.prototype.setName = function(name) {
+        this._name = name;
+    }
+    MessageHolder.prototype.getName = function() {
+        return this._name;
     }
 
     MessageHolder.prototype.addChild = function(name, child) {

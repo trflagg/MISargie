@@ -12,7 +12,7 @@ module.exports = function(db, callback) {
 
         function(callback) {
             // load our hero
-            db.load('Avatar', {name: 'Picard'}, function(err, picard) {
+            db.load('Avatar', {_name: 'Picard'}, function(err, picard) {
                 assert.equal(err, null, err);
                 callback(null, picard);
             });
@@ -46,7 +46,7 @@ module.exports = function(db, callback) {
 
         function(picard, result, callback) {
             // test trigger is added to end
-            assert.equal(result, 
+            assert.equal(result,
                 'This is captain Tolares. We have a medical emergency on our ship, we are requesting immediate emergency access.\n' +
                 'Trigger!\n');
 
@@ -62,7 +62,7 @@ module.exports = function(db, callback) {
 
         function(picard, result, callback) {
             // test new trigger is added to end
-            assert.equal(result, 
+            assert.equal(result,
                 'The ships reverses thrust and comes to a complete halt. It hails you.\n' +
                 'Trigger!\n' +
                 'add trigger!\n');
@@ -78,7 +78,7 @@ module.exports = function(db, callback) {
 
         function(picard, result, callback) {
             // test new trigger is added to end
-            assert.equal(result, 
+            assert.equal(result,
                     'Alarms go off signaling that the enemy vessel has readied its weapons.\n' +
                     util.format(constants.waitString,1000) +
                     '\nLasers strike from the front of the enemy ship, but they disintegrate in the shield.\n ' +
@@ -96,7 +96,7 @@ module.exports = function(db, callback) {
 
         function(picard, result, callback) {
             // test new trigger is added to end
-            assert.equal(result, 
+            assert.equal(result,
                     'You hear no response. Only gargling.' +
                     'Alarms go off signaling that the enemy vessel has readied its weapons.\n' +
                     util.format(constants.waitString,1000) +

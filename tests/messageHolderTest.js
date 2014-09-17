@@ -48,7 +48,7 @@ module.exports = function(db, callback) {
 
         // avatar as messageHolder
         function(messageHolder, callback) {
-            db.load('Avatar', {name:'Joe'}, function(err, avatar) {
+            db.load('Avatar', {_name:'Joe'}, function(err, avatar) {
                 assert.equal(err, null);
                 avatar.addMessage('Hail Ship', 'G1_HAIL_SHIP');
                 assert.equal('G1_HAIL_SHIP', avatar.message('Hail Ship'));
@@ -66,7 +66,7 @@ module.exports = function(db, callback) {
 
         // load avatar with messages
         function(callback) {
-            db.load('Avatar', {name: 'Joe'}, function(err, avatar) {
+            db.load('Avatar', {_name: 'Joe'}, function(err, avatar) {
                 assert.equal(err, null);
                 assert.equal(avatar.messageCount(), 1);
                 assert.equal(avatar.child('Shields')._messages['Shields Up'], 'G1_SHIELDS_UP');

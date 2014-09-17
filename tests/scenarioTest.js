@@ -25,7 +25,7 @@ module.exports = function(db, callback) {
 
         function(callback) {
             // load our hero
-            db.load('Avatar', {name: 'Picard'}, function(err, picard) {
+            db.load('Avatar', {_name: 'Picard'}, function(err, picard) {
                 assert.equal(err, null, err);
                 callback(null, picard);
             });

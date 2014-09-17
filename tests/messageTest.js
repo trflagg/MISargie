@@ -40,7 +40,7 @@ module.exports = function(db, callback) {
 
         // run message on an avatar.
         function(message, callback) {
-            db.load('Avatar', {name: 'Joe'}, function(err, avatar) {
+            db.load('Avatar', {_name: 'Joe'}, function(err, avatar) {
                 message.run(avatar, function(err, result) {
                     console.log(result);
                     // console.log(err);

@@ -146,9 +146,6 @@ module.exports = function(db, collectionName) {
         return Object.keys(this._messages).length;
     };
     MessageHolder.prototype.getCommandTextList = function() {
-        if (!this._visible) {
-            return null;
-        }
         var list = [];
         var keys = Object.keys(this._messages);
         for (var i =0, ll=keys.length; i<ll; i++) {

@@ -103,7 +103,7 @@ module.exports = function(db, collectionName) {
     }
 
 
-    Message.prototype.run = function(avatar, callback) {
+    Message.prototype.run = function*(avatar) {
         if (!this._compiled) {
             this.compile();
         }
@@ -114,36 +114,24 @@ module.exports = function(db, collectionName) {
         // load any messages
         var messagesLoaded = this.messagesLoaded();
         if (messagesLoaded.length > 0) {
-            // callback variable
-            var originalMessage = this;
+            var messages = yield db.loadMultiple('Message', {name: { $in: messagesLoaded}});
+            var msgObject = {};
+            for(var i=0, ll=messages.length; i<ll; i++) {
+                msgObject[messages[i].getName()] = messages[i];
+            }
+            system.loadedMessages = msgObject;
+        }
 
-            db.loadMultiple('Message', {name: { $in: messagesLoaded}}, function(err, messages) {
-                if (err) {
-                    console.log(err);
-                    return callback(err, '');
-                }
-                var msgObject = {};
-                for(var i=0, ll=messages.length; i<ll; i++) {
-                    msgObject[messages[i].getName()] = messages[i];
-                }
-                system.loadedMessages = msgObject;
-                // kick it off
-                result = originalMessage._compiled({
-                            avatar: avatarWrapper,
-                            system: system
-                        })
-                callback(null, result);
-            });
-        }
-        else {
-            // kick it off
-            result = this._compiled({
-                            avatar: avatarWrapper,
-                            system: system
-                        })
-            callback(null, result);
-        }
+        // kick it off
+        result = this._compiled({
+                        avatar: avatarWrapper,
+                        system: system
+        });
+
+        return result;
+
     };
+
     db.register('Message', Message);
 
     return Message;

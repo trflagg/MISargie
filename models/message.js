@@ -102,7 +102,6 @@ module.exports = function(db, collectionName) {
         return this._compiled;
     }
 
-
     Message.prototype.run = function*(avatar) {
         if (!this._compiled) {
             this.compile();

@@ -174,7 +174,9 @@ module.exports = function(db, collectionName) {
         this._triggers.remove(messageName);
     };
 
-    Avatar.prototype.runMessage = function*(commandText, child='') {
+    Avatar.prototype.runMessage = function*(commandText, child) {
+
+        child = child ? child : '';
 
         // triggers
         var messageList = this._triggers.clone();
@@ -212,9 +214,10 @@ module.exports = function(db, collectionName) {
     };
 
     Avatar.prototype._runTriggerList = function*(triggers, result) {
-        triggers.each(function(triggerMessage) {
-            result = result + yield triggerMessage.run(this);
-        })
+        for(var i=0, ll=triggers.length; i<ll; i++) {
+            var trigger_result = yield triggers[i].run(this);
+            result = result + trigger_result;
+        }
     };
 
     db.register('Avatar', Avatar);

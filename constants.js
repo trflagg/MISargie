@@ -6,5 +6,5 @@ module.exports = function() {
 
         clearScreenString: '{% clearScreen() %}',
         clearScreenRegEx: /^{% clearScreen\(\) %}$/
-   } 
+   }
 }()

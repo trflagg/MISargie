@@ -174,12 +174,7 @@ module.exports = function(db, collectionName) {
         this._triggers.remove(messageName);
     };
 
-    Avatar.prototype.runMessage = function(commandText, child, callback) {
-        // make child optional
-        if (typeof child === 'function') {
-            callback = child;
-            child = '';
-        }
+    Avatar.prototype.runMessage = function*(commandText, child='') {
 
         // triggers
         var messageList = this._triggers.clone();
@@ -188,63 +183,38 @@ module.exports = function(db, collectionName) {
         var messageName = this.message(commandText, child);
         messageList.push(messageName);
 
-        //callback variable
-        var avatar = this;
-
         // load & run
-        db.loadMultiple('Message', {name: { $in: messageList}}, function(err, messages) {
-            if (err) {
-                return callback(err, null);
+        var message = yield db.loadMultiple('Message', {name: { $in: messageList}});
+        var triggers = [];
+        var message = {};
+        var foundMessage = false;
+        for (var i=0,ll=messages.length; i<ll; i++) {
+            if (messages[i].getName() == messageName) {
+                message = messages[i];
+                foundMessage = true;
             }
-            var triggers = [];
-            var message = {};
-            var foundMessage = false;
-            for (var i=0,ll=messages.length; i<ll; i++) {
-                if (messages[i].getName() == messageName) {
-                    message = messages[i];
-                    foundMessage = true;
-                }
-                else {
-                    triggers.push(messages[i]);
-                }
+            else {
+                triggers.push(messages[i]);
             }
+        }
 
-            if (!foundMessage) {
-                return callback('Message ' + messageName + ' NOT FOUND.', null);
-            }
+        if (!foundMessage) {
+            return callback('Message ' + messageName + ' NOT FOUND.', null);
+        }
 
-            if (message.autoRemove()) {
-                avatar.removeMessage(commandText)
-            }
+        if (message.autoRemove()) {
+            this.removeMessage(commandText)
+        }
 
-            message.run(avatar, function(err, result) {
-                if (err) {
-                    return callback(err, null);
-                }
+        var reesult = yield message.run(avatar);
 
-                avatar._runTriggerList(triggers, result, callback);
-            });
-        });
-
+        this._runTriggerList(triggers, result);
     };
 
-    Avatar.prototype._runTriggerList = function(triggers, result, callback) {
-
-        // closure variable
-        var avatar = this;
-
-        // run each trigger
-        async.concatSeries(triggers, function(triggerMessage, callback) {
-            triggerMessage.run(avatar, function(err, trigger_result) {
-                callback(err, trigger_result);
-            });
-        },
-        // end function
-        function(err, results) {
-            result = result + results.join('');
-            callback(null, result);
-        });
-
+    Avatar.prototype._runTriggerList = function*(triggers, result) {
+        triggers.each(function(triggerMessage) {
+            result = result + yield triggerMessage.run(this);
+        })
     };
 
     db.register('Avatar', Avatar);

@@ -45,5 +45,11 @@ module.exports = function(db) {
 		}
 	}
 
+	System.prototype.registerFunction = function(func) {
+		this[func.functionName] = function() {
+			func.functionBody.apply(this, arguments);
+		}
+	}
+
 	return System;
 };

@@ -186,7 +186,7 @@ module.exports = function(db, collectionName) {
         messageList.push(messageName);
 
         // load & run
-        var message = yield db.loadMultiple('Message', {name: { $in: messageList}});
+        var messages = yield db.loadMultiple('Message', {name: { $in: messageList}});
         var triggers = [];
         var message = {};
         var foundMessage = false;
@@ -201,16 +201,18 @@ module.exports = function(db, collectionName) {
         }
 
         if (!foundMessage) {
-            return callback('Message ' + messageName + ' NOT FOUND.', null);
+            throw new Error('Message ' + messageName + ' NOT FOUND.', null);
         }
 
         if (message.autoRemove()) {
             this.removeMessage(commandText)
         }
 
-        var reesult = yield message.run(avatar);
+        var result = yield message.run(this);
 
-        this._runTriggerList(triggers, result);
+        result = yield this._runTriggerList(triggers, result);
+
+        return result;
     };
 
     Avatar.prototype._runTriggerList = function*(triggers, result) {
@@ -218,6 +220,8 @@ module.exports = function(db, collectionName) {
             var trigger_result = yield triggers[i].run(this);
             result = result + trigger_result;
         }
+
+        return result;
     };
 
     db.register('Avatar', Avatar);

@@ -41,6 +41,7 @@ module.exports = function(db) {
 
 	System.prototype.registerRegEx = function(regEx) {
 		this[regEx.functionName] = function(arg) {
+			arg = arg || '';
 			return util.format(regEx.placeholder, arg);
 		}
 	}

@@ -224,6 +224,14 @@ module.exports = function(db, collectionName) {
         return result;
     };
 
+    Avatar.prototype.reset = function*(messageName) {
+        this.clear();
+        if(messageName) {
+            var message = yield db.load('Message', {name: messageName});
+            return yield message.run(this);
+        }
+        return null;
+    };
     db.register('Avatar', Avatar);
 
     return Avatar;

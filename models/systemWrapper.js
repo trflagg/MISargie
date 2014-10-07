@@ -30,17 +30,9 @@ module.exports = function(db) {
         });
 	};
 
-	System.prototype.wait = function(time_in_miliseconds) {
-		// insert wait string
-		return util.format(constants.waitString, time_in_miliseconds);
-	}
-
-	System.prototype.clearScreen = function() {
-		return constants.clearScreenString
-	};
-
 	System.prototype.registerRegEx = function(regEx) {
 		this[regEx.functionName] = function(arg) {
+			arg = arg || '';
 			return util.format(regEx.placeholder, arg);
 		}
 	}

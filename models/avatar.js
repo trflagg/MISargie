@@ -3,7 +3,6 @@ module.exports = function(db, collectionName) {
     var util = require('util'),
         sugar = require('sugar'),
         async = require('async'),
-        codeHandler = require('./codeHandler'),
         MessageHolder = require('./messageHolder')(db),
         BNum = require('./bNum')(db),
         returnObject = {},

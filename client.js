@@ -3,14 +3,14 @@ var firstMessage = 'INIT';
 
 var environment = require('./environments/environment-local'),
     readline = require('readline'),
-    Db = require('argieDb/db'),
+    Db = require('argieDB/db'),
     constants = require('./constants');
 
 
 // the worst thing ever to do in nodejs EVER
 function sleep(miliseconds) {
     var start = new Date;
-    
+
     // NEVER DO THIS!  I AM A PROFESSIONAL!
     while((new Date - start) <= miliseconds) {
         ;
@@ -52,7 +52,7 @@ function start() {
         }
         else {
             message.run(avatar, function(err, result) {
-                
+
                 // show result of message
                 printLines(result);
 
@@ -143,7 +143,7 @@ function promptOptions(options, currentChoice) {
                 answer = new String(answer - 1);
                 currentChoice = addChoice(currentChoice, answer);
             }
-            
+
             promptOptions(options, currentChoice);
         }
     });

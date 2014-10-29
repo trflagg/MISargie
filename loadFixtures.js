@@ -3,7 +3,7 @@
 var fs = require('fs'),
     EventEmitter = require('events').EventEmitter,
     yaml = require('js-yaml');
-    Db = require('argieDb/db');
+    Db = require('argieDB/db');
 
 var fixtures_dir = './fixtures/';
 

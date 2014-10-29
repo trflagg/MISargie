@@ -1,6 +1,6 @@
 module.exports = function(db, collectionName) {
     var util = require('util'),
-        Model = require('argieDb/model')(db, collectionName);
+        Model = require('argieDB/model')(db, collectionName);
 
     MessageHolder = function(doc) {
         MessageHolder.super_.call(this, doc);

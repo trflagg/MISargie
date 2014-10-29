@@ -3,7 +3,6 @@ module.exports = function(db, collectionName) {
         async = require('async'),
         underscore = require('underscore'),
         Model = require('argieDB/model')(db),
-        Nodes = require('./Nodes'),
         System = require('./systemWrapper'),
         AvatarWrapper = require('./avatarWrapper'),
         collectionName = collectionName || 'messages';

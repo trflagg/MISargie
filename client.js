@@ -139,8 +139,7 @@ function promptOptions(options, currentChoice) {
         else if (!handleOptions(answer)) {
             console.log('');
             if (!isNaN(answer)) {
-                // because client starts at 1 instead of 0
-                answer = new String(answer - 1);
+                answer = new String(answer);
                 currentChoice = addChoice(currentChoice, answer);
             }
 

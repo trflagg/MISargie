@@ -1,13 +1,13 @@
 /**
  * system object used in context while running messages.
- * 
+ *
  * @return {Object}
  */
-module.exports = function() {
+module.exports = function(db) {
 
 	var util = require('util'),
 		constants = require('../constants'),
-		AvatarWrapper = require('./avatarWrapper');
+		AvatarWrapper = require('./avatarWrapper')(db);
 
 	System = function(avatar) {
 		this.loadedMessages = [];
@@ -25,13 +25,13 @@ module.exports = function() {
 		}
 		var avatarWrapper = new AvatarWrapper(this._avatar);
 		return msg._compiled({
-        	avatar: avatarWrapper, 
+        	avatar: avatarWrapper,
         	system: this
         });
 	};
 
 	System.prototype.wait = function(time_in_miliseconds) {
-		// insert wait string 
+		// insert wait string
 		return util.format(constants.waitString, time_in_miliseconds);
 	}
 
@@ -40,4 +40,4 @@ module.exports = function() {
 	};
 
 	return System;
-}();
+};

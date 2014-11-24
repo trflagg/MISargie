@@ -3,8 +3,8 @@ module.exports = function(db, collectionName) {
         async = require('async'),
         underscore = require('underscore'),
         Model = require('argieDB/model')(db),
-        System = require('./systemWrapper'),
-        AvatarWrapper = require('./avatarWrapper'),
+        System = require('./systemWrapper')(db),
+        AvatarWrapper = require('./avatarWrapper')(db),
         collectionName = collectionName || 'messages';
 
 
@@ -129,7 +129,7 @@ module.exports = function(db, collectionName) {
                 system.loadedMessages = msgObject;
                 // kick it off
                 result = originalMessage._compiled({
-                            avatar: avatarWrapper, 
+                            avatar: avatarWrapper,
                             system: system
                         })
                 callback(null, result);
@@ -138,7 +138,7 @@ module.exports = function(db, collectionName) {
         else {
             // kick it off
             result = this._compiled({
-                            avatar: avatarWrapper, 
+                            avatar: avatarWrapper,
                             system: system
                         })
             callback(null, result);

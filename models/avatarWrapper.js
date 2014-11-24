@@ -2,10 +2,12 @@
  * Avatar object used in context while running a message template.
  * Holds avatar it represents.
  * Wrapper exposes only certain methods to the message templates.
- * 
+ *
  * @return {[type]} [description]
  */
-module.exports = function() {
+module.exports = function(db) {
+
+	var MessageHolder = require('./messageHolder')(db);
 
 	AvatarWrapper = function(avatar) {
 		this.avatar = avatar;
@@ -34,6 +36,9 @@ module.exports = function() {
 		return this.avatar.addBNum(name, amount);
 	};
 
+	AvatarWrapper.prototype.addChild = function(name) {
+		return this.avatar.addChild(name, new MessageHolder());
+	}
 	AvatarWrapper.prototype.addMessage = function(commandText, messageName, child) {
 		return this.avatar.addMessage(commandText, messageName, child);
 	};
@@ -61,4 +66,4 @@ module.exports = function() {
 
 
 	return AvatarWrapper;
-}();
+};

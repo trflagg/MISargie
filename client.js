@@ -21,6 +21,8 @@ function printLines(result, callback) {
 
     if (result) {
         var lines = result.split('\n');
+        // collapse multiple empty lines into 1
+        var collapseEmpty = false;
 
         for (var i = 0, ll = lines.length; i<ll; i++) {
             var currentLine = lines[i];
@@ -36,7 +38,16 @@ function printLines(result, callback) {
                 clearScreen();
             }
             else {
-                console.log(currentLine);
+                if (currentLine === '') {
+                    if (!collapseEmpty) {
+                        console.log('');
+                        collapseEmpty = true;
+                    }
+                }
+                else {
+                    console.log(currentLine);
+                    collapseEmpty = false;
+                }
             }
         }
     }

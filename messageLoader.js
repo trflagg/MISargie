@@ -4,9 +4,15 @@ module.exports = function() {
     EventEmitter = require('events').EventEmitter,
     yaml = require('js-yaml');
 
-  var Loader = function(environment) {
-    Db = require('argieDB/co-db');
-    this.db = new Db(environment);
+  var Loader = function(environmentOrDb) {
+    if (!environmentOrDb._db) {
+      // it's an environment
+      Db = require('argieDB/co-db');
+      this.db = new Db(environment);
+    } else {
+      this.db = environmentOrDb;
+    }
+
     require('./models/message')(this.db);
     require('./models/location')(this.db);
   }

@@ -64,6 +64,11 @@ module.exports = function(db) {
 		return this.avatar.removeTrigger(messageName);
 	};
 
+	AvatarWrapper.prototype.setLocation = function(locationName) {
+		return this.avatar.setLocation(locationName);
+	};
+
 
 	return AvatarWrapper;
-};
+
+}();

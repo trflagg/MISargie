@@ -39,5 +39,18 @@ module.exports = function(db) {
 		return constants.clearScreenString
 	};
 
+	System.prototype.registerRegEx = function(regEx) {
+		this[regEx.functionName] = function(arg) {
+			arg = arg || '';
+			return util.format(regEx.placeholder, arg);
+		}
+	}
+
+	System.prototype.registerFunction = function(func) {
+		this[func.functionName] = function() {
+			func.functionBody.apply(this, arguments);
+		}
+	}
+
 	return System;
-};
+}();

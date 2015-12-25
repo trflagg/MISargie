@@ -204,11 +204,11 @@ module.exports = function(db, collectionName) {
     // mongodb doesn't allow periods in keys
     // replace periods with [dot]
     function commandTextRemovePeriods(commandText) {
-      return commandText.replace('.', '[dot]');
+      return commandText.replace(/(\.)/g, '[dot]');
     }
 
     function commandTextAddPeriods(commandText) {
-      return commandText.replace('[dot]', '.');
+      return commandText.replace(/(\[dot\])/g, '.');
     }
 
     return MessageHolder;

@@ -98,6 +98,7 @@ module.exports = function(db, collectionName) {
             return this.child(childArray[1]).addMessage(commandText, messageName, childArray[2]);
         }
         else {
+            commandText = commandTextRemovePeriods(commandText);
             this._messages[commandText] = messageName;
             if (this._newMessageText) {
                 return this._newMessageText.replace(/(%s)/,commandText);
@@ -107,8 +108,10 @@ module.exports = function(db, collectionName) {
 
     };
     MessageHolder.prototype.removeMessage = function(commandText) {
-        if (this._messages.hasOwnProperty(commandText)) {
-            delete this._messages[commandText];
+        var replacedCommandText = commandTextRemovePeriods(commandText);
+
+        if (this._messages.hasOwnProperty(replacedCommandText)) {
+            delete this._messages[replacedCommandText];
         }
         else {
             // message not here, look in children
@@ -127,6 +130,7 @@ module.exports = function(db, collectionName) {
             return this.child(childArray[1]).message(commandText, childArray[2]);
         }
         else {
+            commandText = commandTextRemovePeriods(commandText);
             return this._messages[commandText];
         }
     }
@@ -150,7 +154,7 @@ module.exports = function(db, collectionName) {
         var keys = Object.keys(this._messages);
         for (var i =0, ll=keys.length; i<ll; i++) {
             var obj = {};
-            obj.text = keys[i];
+            obj.text = commandTextAddPeriods(keys[i]);
             list.push(obj);
         }
         var children = this._children;
@@ -195,6 +199,16 @@ module.exports = function(db, collectionName) {
         }
 
         return messages;
+    }
+
+    // mongodb doesn't allow periods in keys
+    // replace periods with [dot]
+    function commandTextRemovePeriods(commandText) {
+      return commandText.replace('.', '[dot]');
+    }
+
+    function commandTextAddPeriods(commandText) {
+      return commandText.replace('[dot]', '.');
     }
 
     return MessageHolder;

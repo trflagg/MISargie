@@ -14,18 +14,24 @@ module.exports = function(db, callback) {
             var messageHolder = new MessageHolder();
             messageHolder.addMessage('Red Alert', 'G1_RED_ALERT');
             messageHolder.addMessage('Yellow Alert', 'G1_YELLOW_ALERT');
-            messageHolder.addMessage('Green Alert', 'G1_GREEN_ALERT');
+            messageHolder.addMessage('Green Alert.', 'G1_GREEN_ALERT');
             assert.equal(messageHolder.messageCount(), 3);
             assert.equal(messageHolder.getCommandTextList()[0].text, 'Red Alert');
             assert.equal(messageHolder.getCommandTextList()[1].text, 'Yellow Alert');
-            assert.equal(messageHolder.getCommandTextList()[2].text, 'Green Alert');
+            assert.equal(messageHolder.getCommandTextList()[2].text, 'Green Alert.');
 
             messageHolder.removeMessage('Yellow Alert');
             assert.equal(messageHolder.messageCount(), 2);
 
             var obj = messageHolder.toObject();
             assert.equal(obj['Red Alert'], 'G1_RED_ALERT');
-            assert.equal(obj['Green Alert'], 'G1_GREEN_ALERT');
+            assert.equal(obj['Green Alert[dot]'], 'G1_GREEN_ALERT');
+
+            var message_name = messageHolder.message('Green Alert.');
+            assert.equal(message_name, 'G1_GREEN_ALERT');
+
+            messageHolder.removeMessage('Green Alert.');
+            assert.equal(messageHolder.messageCount(), 1);
 
             var weapons = new MessageHolder();
             weapons.addMessage('Fire Lasers', 'G1_FIRE_LASERS');

@@ -2,7 +2,7 @@
  * Avatar object used in context while running a message template.
  * Holds avatar it represents.
  * Wrapper exposes only certain methods to the message templates.
- * 
+ *
  * @return {[type]} [description]
  */
 module.exports = function() {
@@ -63,6 +63,12 @@ module.exports = function() {
 		return this.avatar.setLocation(locationName);
 	};
 
+
+	AvatarWrapper.prototype.registerFunction = function(func) {
+		this[func.functionName] = function() {
+			func.functionBody.apply(this, arguments);
+		}
+	};
 
 	return AvatarWrapper;
 

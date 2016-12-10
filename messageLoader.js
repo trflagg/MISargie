@@ -120,15 +120,19 @@ module.exports = function() {
         var file = files[i];
         console.log(file);
 
-        // check extension
-        if (endsWith(file, '.msgs')) {
-            yield loader.processMsgsFile(dir, file);
-        }
-        else if (endsWith(file, '.yaml') || endsWith(file, '.yml')) {
-            yield loader.processYamlFile(dir, file);
-        }
+        if (!file.startsWith('.')) {
+            // check extension
+            if (endsWith(file, '.msgs')) {
+                yield loader.processMsgsFile(dir, file);
+            }
+            else if (endsWith(file, '.yaml') || endsWith(file, '.yml')) {
+                yield loader.processYamlFile(dir, file);
+            }
 
-        console.log('saved ----------------------');
+            console.log('saved ----------------------');
+        } else {
+            console.log('skipped ------------------');
+        }
       }
       // done.
       console.log('goodbye');

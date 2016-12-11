@@ -66,7 +66,7 @@ module.exports = function() {
 
 	AvatarWrapper.prototype.registerFunction = function(func) {
 		this[func.functionName] = function() {
-			func.functionBody.apply(this, arguments);
+			return func.functionBody.apply(this, arguments);
 		}
 	};
 

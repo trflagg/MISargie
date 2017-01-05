@@ -190,6 +190,7 @@ module.exports = function(db, collectionName) {
         var triggers = [];
         var message = {};
         var foundMessage = false;
+        var child_level = this.getLevel(child);
         for (var i=0,ll=messages.length; i<ll; i++) {
             if (messages[i].getName() == messageName) {
                 message = messages[i];
@@ -202,6 +203,10 @@ module.exports = function(db, collectionName) {
 
         if (!foundMessage) {
             throw new Error('Message ' + messageName + ' NOT FOUND.', null);
+        }
+
+        if (message.getLevel() > this.getLevel(child)) {
+            throw new Error('Level ' +message.getLevel()+ ' required to run this message', null);
         }
 
         if (message.autoRemove()) {

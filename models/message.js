@@ -23,6 +23,7 @@ module.exports = function(db, collectionName) {
             this._autoRemove = doc.autoRemove;
             this._messagesLoaded = doc.messagesLoaded;
             this._globalsRequested = doc.globalsRequested;
+            this._level = doc.level;
         }
         else {
             // make new Message
@@ -32,6 +33,7 @@ module.exports = function(db, collectionName) {
             this._autoRemove = true;
             this._messagesLoaded = [];
             this._globalsRequested = [];
+            this._level = 1;
         }
     }
     util.inherits(Message, Model);
@@ -51,6 +53,7 @@ module.exports = function(db, collectionName) {
         doc.autoRemove = message.autoRemove();
         doc.messagesLoaded = message._messagesLoaded;
         doc.globalsRequested = message._globalsRequested;
+        doc.level = message._level;
 
         return doc;
     };
@@ -100,6 +103,13 @@ module.exports = function(db, collectionName) {
 
         this._compiled = underscore.template(this._text);
         return this._compiled;
+    }
+
+    Message.prototype.getLevel = function() {
+        return this._level;
+    }
+    Message.prototype.setLevel = function(level) {
+        this._level = level;
     }
 
     Message.prototype.run = function*(avatar) {

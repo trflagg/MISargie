@@ -17,10 +17,14 @@ module.exports = function() {
     require('./models/location')(this.db);
   }
 
-  Loader.prototype.saveMessage = function*(messageName, messageText, loadedMessages) {
+  Loader.prototype.saveMessage = function*(messageName, messageText, loadedMessages, level) {
     var newMessage = this.db.create('Message');
     newMessage.setName(messageName);
     newMessage.setText(messageText);
+
+      if (level && level != '') {
+          newMessage.setLevel(level);
+      }
 
     if (loadedMessages.length > 0) {
         newMessage.setMessagesLoaded(loadedMessages);
@@ -51,6 +55,7 @@ module.exports = function() {
         var loadedMessages = [];
 
         // read line by line
+        var level = '';
         var text = '';
         for (var i=1, ll=lines.length; i < ll; i++) {
             var line = lines[i];
@@ -60,12 +65,16 @@ module.exports = function() {
                     var loadName = /^# loadMessage\(\'(\w+)\'\)/.exec(line)[1];
                     loadedMessages.push(loadName);
                 }
+                else if (line.indexOf('# level ') == 0) {
+                    var level = /^# level (\d+)/.exec(line)[1];
+                }
                 else if (line == '#--') {
                     // new message
-                    yield this.saveMessage(messageName, text, loadedMessages);
+                    yield this.saveMessage(messageName, text, loadedMessages, level);
                     text = '';
                     i++;
                     var messageName = /^# (\w+)/.exec(lines[i])[1];
+                    var level = '';
                     var loadedMessages = [];
                 }
             } else {

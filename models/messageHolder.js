@@ -7,13 +7,16 @@ module.exports = function(db, collectionName) {
     }
     util.inherits(MessageHolder, Model);
 
-    MessageHolder.prototype.initialize = function() {
+    MessageHolder.prototype.initialize = function(options) {
         MessageHolder.super_.prototype.initialize.call(this);
 
         this._messages = {};
         this._children = {};
         this._newMessageText = null;
         this._visible = true;
+
+        this._level = 1;
+        this._supportsLevels = (options && options.supportsLevels) ? options.supportsLevels : false;
     }
 
     MessageHolder.prototype.loadFromDoc = function(doc) {
@@ -23,6 +26,8 @@ module.exports = function(db, collectionName) {
         if(doc._messages) this._messages = doc._messages;
         if(doc._newMessageText) this._newMessageText = doc._newMessageText;
         if(doc._visible) this._visible = doc._visible;
+        if(doc._level) this._level = doc._level;
+        if(doc._supportsLevels) this._supportsLevels = doc._supportsLevels;
 
         // make a new messageHolder object for every child in doc
         if (doc._children) {
@@ -43,6 +48,8 @@ module.exports = function(db, collectionName) {
         doc._children = this._children;
         doc._newMessageText = this._newMessageText;
         doc._visible = this._visible;
+        doc._level = this._level;
+        doc._supportsLevels = this._supportsLevels;
 
         return doc;
     }
@@ -67,7 +74,7 @@ module.exports = function(db, collectionName) {
         if (child) {
             // childArray[1] = first item of dot-separated children
             // childArray[2] = rest of the string (minus the dot)
-            var childArray = /(\w+)(?:\.([\w.]+))*/.exec(child);
+            var childArray = childArrayFromString(child);
             return this.child(childArray[1]).hideChild(childArray[2]);
         }
         else {
@@ -78,7 +85,7 @@ module.exports = function(db, collectionName) {
         if (child) {
             // childArray[1] = first item of dot-separated children
             // childArray[2] = rest of the string (minus the dot)
-            var childArray = /(\w+)(?:\.([\w.]+))*/.exec(child);
+            var childArray = childArrayFromString(child);
             return this.child(childArray[1]).showChild(childArray[2]);
         }
         else {
@@ -94,7 +101,7 @@ module.exports = function(db, collectionName) {
         if (child) {
             // childArray[1] = first item of dot-separated children
             // childArray[2] = rest of the string (minus the dot)
-            var childArray = /(\w+)(?:\.([\w.]+))*/.exec(child);
+            var childArray = childArrayFromString(child);
             return this.child(childArray[1]).addMessage(commandText, messageName, childArray[2]);
         }
         else {
@@ -201,6 +208,28 @@ module.exports = function(db, collectionName) {
         return messages;
     }
 
+    MessageHolder.prototype.increaseLevel = function(child) {
+        if (child) {
+            // childArray[1] = first item of dot-separated children
+            // childArray[2] = rest of the string (minus the dot)
+            var childArray = childArrayFromString(child);
+            return this.child(childArray[1]).increaseLevel(child);
+        }
+
+        return this._level++;
+    }
+
+    MessageHolder.prototype.getLevel = function(child) {
+        if (child) {
+            // childArray[1] = first item of dot-separated children
+            // childArray[2] = rest of the string (minus the dot)
+            var childArray = childArrayFromString(child);
+            return this.child(childArray[1]).getLevel(child);
+        }
+
+        return this._level;
+    }
+
     // mongodb doesn't allow periods in keys
     // replace periods with [dot]
     function commandTextRemovePeriods(commandText) {
@@ -209,6 +238,12 @@ module.exports = function(db, collectionName) {
 
     function commandTextAddPeriods(commandText) {
       return commandText.replace(/(\[dot\])/g, '.');
+    }
+
+    function childArrayFromString(child) {
+        // childArray[1] = first item of dot-separated children
+        // childArray[2] = rest of the string (minus the dot)
+        return /(\w+)(?:\.([\w.]+))*/.exec(child);
     }
 
     return MessageHolder;

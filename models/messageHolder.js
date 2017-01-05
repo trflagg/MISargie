@@ -7,7 +7,7 @@ module.exports = function(db, collectionName) {
     }
     util.inherits(MessageHolder, Model);
 
-    MessageHolder.prototype.initialize = function(options) {
+    MessageHolder.prototype.initialize = function() {
         MessageHolder.super_.prototype.initialize.call(this);
 
         this._messages = {};
@@ -15,8 +15,8 @@ module.exports = function(db, collectionName) {
         this._newMessageText = null;
         this._visible = true;
 
+        this._supportsLevels = false;
         this._level = 1;
-        this._supportsLevels = (options && options.supportsLevels) ? options.supportsLevels : false;
     }
 
     MessageHolder.prototype.loadFromDoc = function(doc) {
@@ -162,15 +162,22 @@ module.exports = function(db, collectionName) {
         for (var i =0, ll=keys.length; i<ll; i++) {
             var obj = {};
             obj.text = commandTextAddPeriods(keys[i]);
+            if (this._supportsLevels) {
+                obj.level = this.getLevel();
+            }
             list.push(obj);
         }
         var children = this._children;
         for (var childName in children) {
             if (children.hasOwnProperty(childName)) {
                 var obj = {}
-                obj.childMessageCount = this._children[childName].childMessageCount();
+                var child = this._children[childName];
+                obj.childMessageCount = child.childMessageCount();
                 obj.text = childName
-                obj.children = this._children[childName].getCommandTextList();
+                if (child._supportsLevels) {
+                    obj.level = child.getLevel();
+                }
+                obj.children = child.getCommandTextList();
                 obj.visible = this._visible;
                 if (obj.children) {
                     list.push(obj);
@@ -208,12 +215,16 @@ module.exports = function(db, collectionName) {
         return messages;
     }
 
+    MessageHolder.prototype.supportLevels = function() {
+        this._supportsLevels = true;
+    }
+
     MessageHolder.prototype.increaseLevel = function(child) {
         if (child) {
             // childArray[1] = first item of dot-separated children
             // childArray[2] = rest of the string (minus the dot)
             var childArray = childArrayFromString(child);
-            return this.child(childArray[1]).increaseLevel(child);
+            return this.child(childArray[1]).increaseLevel(childArray[2]);
         }
 
         return this._level++;

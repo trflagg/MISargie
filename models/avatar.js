@@ -212,10 +212,6 @@ module.exports = function(db, collectionName) {
             throw new Error('Message ' + messageName + ' NOT FOUND.', null);
         }
 
-        if (message.autoRemove()) {
-            this.removeMessage(commandText)
-        }
-
         var result = yield message.run(this);
 
         result = yield this._runTriggerList(triggers, result);

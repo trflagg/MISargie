@@ -20,7 +20,6 @@ module.exports = function(db, collectionName) {
             this._name = doc.name;
             this._text = doc.text;
             this._compiled = doc.compiled;
-            this._autoRemove = doc.autoRemove;
             this._messagesLoaded = doc.messagesLoaded;
             this._globalsRequested = doc.globalsRequested;
         }
@@ -29,7 +28,6 @@ module.exports = function(db, collectionName) {
             this._name = null;
             this._text = null;
             this._compiled = {};
-            this._autoRemove = true;
             this._messagesLoaded = [];
             this._globalsRequested = [];
         }
@@ -48,19 +46,12 @@ module.exports = function(db, collectionName) {
         doc.name = message._name;
         doc.text = message._text;
         doc.compiled = message._compiled;
-        doc.autoRemove = message.autoRemove();
         doc.messagesLoaded = message._messagesLoaded;
         doc.globalsRequested = message._globalsRequested;
 
         return doc;
     };
 
-    Message.prototype.setAutoRemove = function(bool) {
-        this._autoRemove = bool;
-    }
-    Message.prototype.autoRemove = function() {
-        return this._autoRemove;
-    }
 
     Message.prototype.setName = function(name) {
         this._name = name;

@@ -97,16 +97,28 @@ module.exports = function(db, collectionName) {
         this._newMessageText = text;
     }
 
-    MessageHolder.prototype.addMessage = function(commandText, messageName, child) {
+    MessageHolder.prototype.addMessage = function(commandText, messageName, child, level) {
+        // child is optional, so we might get level instead of child
+        if(typeof child == "number") {
+            level = child;
+            child = '';
+        }
+
+        //default value is 1
+        level = level ? level : 1;
+
         if (child) {
             // childArray[1] = first item of dot-separated children
             // childArray[2] = rest of the string (minus the dot)
             var childArray = childArrayFromString(child);
-            return this.child(childArray[1]).addMessage(commandText, messageName, childArray[2]);
+            return this.child(childArray[1]).addMessage(commandText, messageName, childArray[2], level);
         }
         else {
             commandText = commandTextRemovePeriods(commandText);
-            this._messages[commandText] = messageName;
+            this._messages[commandText] = {
+                message: messageName
+                , level: level
+            }
             if (this._newMessageText) {
                 return this._newMessageText.replace(/(%s)/,commandText);
             }
@@ -235,7 +247,7 @@ module.exports = function(db, collectionName) {
             // childArray[1] = first item of dot-separated children
             // childArray[2] = rest of the string (minus the dot)
             var childArray = childArrayFromString(child);
-            return this.child(childArray[1]).getLevel(child);
+            return this.child(childArray[1]).getLevel(childArray[2]);
         }
 
         return this._level;

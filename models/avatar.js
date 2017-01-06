@@ -182,7 +182,15 @@ module.exports = function(db, collectionName) {
         var messageList = this._triggers.clone();
 
         // message being run
-        var messageName = this.message(commandText, child);
+        var messageObject = this.message(commandText, child);
+        var messageLevel = messageObject['level'];
+
+        // check if we can run it
+        if (messageLevel > this.getLevel(child)) {
+            throw new Error('Message cannot be run. Level is too high');
+        }
+
+        var messageName = messageObject['message'];
         messageList.push(messageName);
 
         // load & run

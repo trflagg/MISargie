@@ -216,6 +216,11 @@ module.exports = function(db, collectionName) {
 
         result = yield this._runTriggerList(triggers, result);
 
+        if (this.recordsUnread(child)) {
+            this.read(commandText, child);
+        } else {
+            this.removeMessage(commandText);
+        }
         return result;
     };
 

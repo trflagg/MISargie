@@ -13,7 +13,6 @@ module.exports = function(db, collectionName) {
         this._messages = {};
         this._children = {};
         this._recordUnread = false;
-        this._unread = {};
         this._newMessageText = null;
         this._visible = true;
 
@@ -27,7 +26,6 @@ module.exports = function(db, collectionName) {
         if(doc._name) this._name = doc._name;
         if(doc._messages) this._messages = doc._messages;
         if(doc._recordUnread) this._recordUnread = doc._recordUnread;
-        if(doc._unread) this._unread = doc._unread;
         if(doc._newMessageText) this._newMessageText = doc._newMessageText;
         if(doc._visible) this._visible = doc._visible;
         if(doc._level) this._level = doc._level;
@@ -51,7 +49,6 @@ module.exports = function(db, collectionName) {
         doc._messages = this._messages;
         doc._children = this._children;
         doc._recordUnread = this._recordUnread;
-        doc._unread = this._unread;
         doc._newMessageText = this._newMessageText;
         doc._visible = this._visible;
         doc._level = this._level;
@@ -124,12 +121,12 @@ module.exports = function(db, collectionName) {
             this._messages[commandText] = {
                 message: messageName
                 , level: level
+                , unread: true
             }
 
             if (this._newMessageText) {
                 return this._newMessageText.replace(/(%s)/,commandText);
             }
-            this._unread[commandText] = true;
             return '';
         }
 
@@ -139,7 +136,6 @@ module.exports = function(db, collectionName) {
 
         if (this._messages.hasOwnProperty(replacedCommandText)) {
             delete this._messages[replacedCommandText];
-            delete this._unread[replaceCommandText];
         }
         else {
             // message not here, look in children
@@ -184,7 +180,7 @@ module.exports = function(db, collectionName) {
             var obj = {};
             obj.text = commandTextAddPeriods(keys[i]);
             obj.level = this._messages[keys[i]]['level'];
-            obj.unread = this._unread[keys[i]];
+            obj.unread = this._messages[keys[i]]['unread'];
             list.push(obj);
         }
         var children = this._children;
@@ -209,7 +205,6 @@ module.exports = function(db, collectionName) {
 
     MessageHolder.prototype.clear = function() {
         this._messages = {};
-        this._unread = {};
         for (var childName in this._children) {
             if (this._children.hasOwnProperty(childName)) {
                 this._children[childName].clear();
@@ -260,6 +255,30 @@ module.exports = function(db, collectionName) {
         }
 
         return this._level;
+    }
+
+    MessageHolder.prototype.setRecordUnread = function(recordUnread) {
+        this._recordUnread = recordUnread
+    }
+    MessageHolder.prototype.recordsUnread = function(child) {
+        if (child) {
+            // childArray[1] = first item of dot-separated children
+            // childArray[2] = rest of the string (minus the dot)
+            var childArray = childArrayFromString(child);
+            return this.child(childArray[1]).recordsUnread(childArray[2]);
+        }
+
+        return this._recordUnread;
+    }
+    MessageHolder.prototype.read = function(commandText, child) {
+        if (child) {
+            // childArray[1] = first item of dot-separated children
+            // childArray[2] = rest of the string (minus the dot)
+            var childArray = childArrayFromString(child);
+            return this.child(childArray[1]).read(commandText, childArray[2]);
+        }
+
+        return this._messages[commandText]['unread'] = false;
     }
 
     // mongodb doesn't allow periods in keys

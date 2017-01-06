@@ -174,9 +174,7 @@ module.exports = function(db, collectionName) {
         for (var i =0, ll=keys.length; i<ll; i++) {
             var obj = {};
             obj.text = commandTextAddPeriods(keys[i]);
-            if (this._supportsLevels) {
-                obj.level = this.getLevel();
-            }
+            obj.level = this._messages[keys[i]]['level'];
             list.push(obj);
         }
         var children = this._children;

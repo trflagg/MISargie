@@ -179,7 +179,9 @@ module.exports = function(db, collectionName) {
         for (var i =0, ll=keys.length; i<ll; i++) {
             var obj = {};
             obj.text = commandTextAddPeriods(keys[i]);
-            obj.level = this._messages[keys[i]]['level'];
+            if (this._supportsLevels) {
+                obj.level = this._messages[keys[i]]['level'];
+            }
             obj.unread = this._messages[keys[i]]['unread'];
             list.push(obj);
         }

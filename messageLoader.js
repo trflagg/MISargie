@@ -1,13 +1,13 @@
 
 module.exports = function() {
-  var fs = require('co-fs'),
+  var fs = require('fs'),
     EventEmitter = require('events').EventEmitter,
     yaml = require('js-yaml');
 
   var Loader = function(environmentOrDb) {
     if (!environmentOrDb._db) {
       // it's an environment
-      Db = require('argieDB/co-db');
+      Db = require('argieDB/db');
       this.db = new Db(environment);
     } else {
       this.db = environmentOrDb;
@@ -17,7 +17,7 @@ module.exports = function() {
     require('./models/location')(this.db);
   }
 
-  Loader.prototype.saveMessage = function*(messageName, messageText, loadedMessages) {
+  Loader.prototype.saveMessage = function(messageName, messageText, loadedMessages) {
     var newMessage = this.db.create('Message');
     newMessage.setName(messageName);
     newMessage.setText(messageText);
@@ -27,20 +27,20 @@ module.exports = function() {
     }
     newMessage.compile();
     console.log(messageName);
-    yield this.db.save('Message', newMessage);
+    this.db.save('Message', newMessage);
   }
 
-  Loader.prototype.saveLocation = function*(name, description, message_name) {
+  Loader.prototype.saveLocation = function(name, description, message_name) {
       var newLocation = this.db.create("Location");
       newLocation.setName(name);
       newLocation.setDescription(description);
       newLocation.setMessage(message_name);
       console.log(name);
-      yield this.db.save("Location", newLocation);
+      this.db.save("Location", newLocation);
   }
 
-  Loader.prototype.processMsgsFile = function*(dir, filename) {
-    var data = yield fs.readFile(dir + filename, {encoding: 'utf8'})
+  Loader.prototype.processMsgsFile = function(dir, filename) {
+    var data = fs.readFile(dir + filename, {encoding: 'utf8'})
 
     // check for multi-message filename.
     // starts with # [messageName]
@@ -62,7 +62,7 @@ module.exports = function() {
                 }
                 else if (line == '#--') {
                     // new message
-                    yield this.saveMessage(messageName, text, loadedMessages);
+                    this.saveMessage(messageName, text, loadedMessages);
                     text = '';
                     i++;
                     var messageName = /^# (\w+)/.exec(lines[i])[1];
@@ -73,30 +73,30 @@ module.exports = function() {
             }
         }
 
-        yield this.saveMessage(messageName, text, loadedMessages);
+        this.saveMessage(messageName, text, loadedMessages);
     }
     else {
       // take off extension
       var messageName = /(\w+)\.\w+/.exec(filename)[1];
       var messageText = data;
-      yield this.saveMessage(messageName, messageText);
+      this.saveMessage(messageName, messageText);
     }
   }
 
-  Loader.prototype.processYamlFile = function*(dir, filename) {
-    var data = yield fs.readFile(dir + filename, {encoding: 'utf8'});
+  Loader.prototype.processYamlFile = function(dir, filename) {
+    var data = fs.readFile(dir + filename, {encoding: 'utf8'});
     var doc = yaml.safeLoad(data);
 
     for(var i=0, ll = doc.length; i<ll; i++) {
         obj = doc[i];
         // default: message
         if (typeof obj.type === 'undefined' || obj.type === 'message') {
-            yield this.saveMessage(obj.name, obj.text);
+            this.saveMessage(obj.name, obj.text);
         }
 
         // location
         else if (obj.type === 'location') {
-            yield this.saveLocation(obj.name, obj.description, obj.message);
+            this.saveLocation(obj.name, obj.description, obj.message);
         }
     }
   }
@@ -107,7 +107,7 @@ module.exports = function() {
 
   var result = {}
 
-  Loader.prototype.loadDirectory = function*(dir) {
+  Loader.prototype.loadDirectory = function(dir) {
       // remove all to begin
       this.db.deleteAll('Message');
 
@@ -115,25 +115,23 @@ module.exports = function() {
       var loader = this;
 
       // load all files in directory
-      files = yield fs.readdir(dir)
-      for(var i=0, ll=files.length; i<ll; i++) {
-        var file = files[i];
+      fs.readdirSync(dir).forEach(function(file) {
         console.log(file);
 
         if (!file.startsWith('.')) {
             // check extension
             if (endsWith(file, '.msgs')) {
-                yield loader.processMsgsFile(dir, file);
+                loader.processMsgsFile(dir, file);
             }
             else if (endsWith(file, '.yaml') || endsWith(file, '.yml')) {
-                yield loader.processYamlFile(dir, file);
+                loader.processYamlFile(dir, file);
             }
 
             console.log('saved ----------------------');
         } else {
             console.log('skipped ------------------');
         }
-      }
+      })
       // done.
       console.log('goodbye');
       this.db.close();
@@ -148,14 +146,7 @@ module.exports = function() {
           , dir = process.argv[3] || './fixtures/'
           , loader = new Loader(environment);
 
-      co.wrap(function*(){
-        try {
-          yield loader.loadDirectory(dir);
-        } catch (err) {
-          console.error(err.message);
-          return;
-        }
-      })();
+      loader.loadDirectory(dir);
   } else {
     return Loader;
   }

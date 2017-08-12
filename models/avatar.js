@@ -176,21 +176,32 @@ module.exports = function(db, collectionName) {
 
     Avatar.prototype.runMessage = function*(commandText, child) {
 
+        var underleveld = false;
+
         child = child ? child : '';
 
         // triggers
         var messageList = this._triggers.clone();
 
+
         // message being run
         var messageObject = this.message(commandText, child);
+        if (!messageObject) {
+            console.log('messageObject not found');
+        }
+        var messageName = messageObject['message'];
         var messageLevel = messageObject['level'];
 
         // check if we can run it
         if (messageLevel > this.getLevel(child)) {
-            throw new Error('Message cannot be run. Level is too high');
+            underleveld = true;
+            if (messageObject.underLeveledMessage) {
+              messageName = messageObject.underLeveledMessage;
+            } else {
+              throw new Error('Message cannot be run. Level is too high');
+            }
         }
 
-        var messageName = messageObject['message'];
         messageList.push(messageName);
 
         // load & run
@@ -216,7 +227,7 @@ module.exports = function(db, collectionName) {
 
         result = yield this._runTriggerList(triggers, result);
 
-        if (this.recordsUnread(child)) {
+        if (underleveld || this.recordsUnread(child)) {
             this.read(commandText, child);
         } else {
             this.removeMessage(commandText);

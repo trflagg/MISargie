@@ -34,8 +34,8 @@ module.exports = function() {
 		return this.avatar.addBNum(name, amount);
 	};
 
-  AvatarWrapper.prototype.addMessage = function(commandText, messageName, child, level) {
-    return this.avatar.addMessage(commandText, messageName, child, level);
+  AvatarWrapper.prototype.addMessage = function(commandText, messageName, child, level, underLeveledMessage) {
+    return this.avatar.addMessage(commandText, messageName, child, level, underLeveledMessage);
 	};
 	AvatarWrapper.prototype.removeMessage = function(commandText) {
 		return this.avatar.removeMessage(commandText);

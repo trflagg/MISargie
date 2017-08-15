@@ -63,6 +63,12 @@ module.exports = function() {
 		return this.avatar.setLocation(locationName);
 	};
 
+  AvatarWrapper.prototype.pushMessages = function() {
+    return this.avatar.pushMessages();
+  };
+  AvatarWrapper.prototype.popMessages = function() {
+    return this.avatar.popMessages();
+  };
 
 	AvatarWrapper.prototype.registerFunction = function(func) {
 		this[func.functionName] = function() {

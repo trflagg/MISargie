@@ -11,6 +11,7 @@ module.exports = function(db, collectionName) {
         MessageHolder.super_.prototype.initialize.call(this);
 
         this._messages = {};
+        this._messageStack = [];
         this._children = {};
         this._recordUnread = false;
         this._newMessageText = null;
@@ -25,6 +26,7 @@ module.exports = function(db, collectionName) {
 
         if(doc._name) this._name = doc._name;
         if(doc._messages) this._messages = doc._messages;
+        if(doc._messageStack) this._messageStack = doc._messageStack;
         if(doc._recordUnread) this._recordUnread = doc._recordUnread;
         if(doc._newMessageText) this._newMessageText = doc._newMessageText;
         if(doc._visible) this._visible = doc._visible;
@@ -47,6 +49,7 @@ module.exports = function(db, collectionName) {
 
         doc._name = this._name;
         doc._messages = this._messages;
+        doc._messageStack = this._messageStack;
         doc._children = this._children;
         doc._recordUnread = this._recordUnread;
         doc._newMessageText = this._newMessageText;
@@ -62,6 +65,14 @@ module.exports = function(db, collectionName) {
     }
     MessageHolder.prototype.getName = function() {
         return this._name;
+    }
+
+    MessageHolder.prototype.pushMessages = function() {
+      this._messageStack.push(this.messages);
+      this._messages = {};
+    }
+    MessageHolder.prototype.popMessages = function() {
+      this._messages = this._messageStack.pop();
     }
 
     MessageHolder.prototype.addChild = function(name, child) {

@@ -13,6 +13,7 @@ module.exports = function(db, collectionName) {
         this._messages = {};
         this._messageStack = [];
         this._children = {};
+        this._childrenStack = [];
         this._recordUnread = false;
         this._newMessageText = null;
         this._visible = true;
@@ -27,6 +28,7 @@ module.exports = function(db, collectionName) {
         if(doc._name) this._name = doc._name;
         if(doc._messages) this._messages = doc._messages;
         if(doc._messageStack) this._messageStack = doc._messageStack;
+        if(doc._childrenStack) this._childrenStack = doc._childrenStack;
         if(doc._recordUnread) this._recordUnread = doc._recordUnread;
         if(doc._newMessageText) this._newMessageText = doc._newMessageText;
         if(doc._visible) this._visible = doc._visible;
@@ -51,6 +53,7 @@ module.exports = function(db, collectionName) {
         doc._messages = this._messages;
         doc._messageStack = this._messageStack;
         doc._children = this._children;
+        doc._childrenStack = this._childrenStack;
         doc._recordUnread = this._recordUnread;
         doc._newMessageText = this._newMessageText;
         doc._visible = this._visible;
@@ -68,7 +71,7 @@ module.exports = function(db, collectionName) {
     }
 
     MessageHolder.prototype.pushMessages = function() {
-      this._messageStack.push(this.messages);
+      this._messageStack.push(this._messages);
       this._messages = {};
     }
     MessageHolder.prototype.popMessages = function() {
@@ -221,6 +224,7 @@ module.exports = function(db, collectionName) {
     MessageHolder.prototype.clear = function() {
         this._messages = {};
         this._messageStack = [];
+        this._childrenStack = [];
         for (var childName in this._children) {
             if (this._children.hasOwnProperty(childName)) {
                 this._children[childName].clear();

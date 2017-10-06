@@ -205,13 +205,13 @@ module.exports = function(db, collectionName) {
             if (children.hasOwnProperty(childName)) {
                 var obj = {}
                 var child = this._children[childName];
+                obj.visible = child._visible;
                 obj.childMessageCount = child.childMessageCount();
                 obj.text = childName
                 if (child._supportsLevels) {
                     obj.level = child.getLevel();
                 }
                 obj.children = child.getCommandTextList();
-                obj.visible = this._visible;
                 if (obj.children) {
                     list.push(obj);
                 }

@@ -70,9 +70,20 @@ module.exports = function(db, collectionName) {
     MessageHolder.prototype.pushMessages = function() {
       this._messageStack.push(this._messages);
       this._messages = {};
+      for (var childName in this._children) {
+          if (this._children.hasOwnProperty(childName)) {
+              this._children[childName].hide();
+          }
+      }
+
     }
     MessageHolder.prototype.popMessages = function() {
       this._messages = this._messageStack.pop();
+      for (var childName in this._children) {
+          if (this._children.hasOwnProperty(childName)) {
+              this._children[childName].show();
+          }
+      }
     }
 
     MessageHolder.prototype.addChild = function(name, child) {
@@ -154,8 +165,6 @@ module.exports = function(db, collectionName) {
             // message not here, look in children
             for (var childName in this._children) {
                 if (this._children.hasOwnProperty(childName)) {
-                    console.dir(this._children);
-                    console.log(childName);
                     this._children[childName].removeMessage(commandText);
                 }
             }

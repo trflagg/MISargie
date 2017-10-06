@@ -220,6 +220,7 @@ module.exports = function(db, collectionName) {
 
     MessageHolder.prototype.clear = function() {
         this._messages = {};
+        this._messageStack = [];
         for (var childName in this._children) {
             if (this._children.hasOwnProperty(childName)) {
                 this._children[childName].clear();

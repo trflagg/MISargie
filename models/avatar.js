@@ -63,6 +63,13 @@ module.exports = function(db, collectionName) {
         return doc;
     };
 
+    Avatar.prototype.clear = function() {
+      Avatar.super_.prototype.clear.call(this);
+      this._globals = {};
+      this._bnums = {};
+      this._triggers = [];
+    };
+
     Avatar.prototype.setGlobal = function(key, value, callback) {
         this._globals[key] = value;
 

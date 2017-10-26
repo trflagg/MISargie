@@ -157,17 +157,27 @@ module.exports = function(db, collectionName) {
     };
     MessageHolder.prototype.removeMessage = function(commandText) {
         var replacedCommandText = commandTextRemovePeriods(commandText);
+        var found = false;
 
         if (this._messages.hasOwnProperty(replacedCommandText)) {
             delete this._messages[replacedCommandText];
         }
         else {
-            // message not here, look in children
+          // try by name
+          for (messageText in this._messages) {
+            if (this._messages[messageText].message === commandText) {
+              delete this._messages[messageText];
+              found = true;
+            }
+          }
+          // message not here, look in children
+          if (!found) {
             for (var childName in this._children) {
                 if (this._children.hasOwnProperty(childName)) {
                     this._children[childName].removeMessage(commandText);
                 }
             }
+          }
         }
     };
     MessageHolder.prototype.message = function(commandText, child) {

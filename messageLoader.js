@@ -5,6 +5,7 @@ module.exports = function() {
     yaml = require('js-yaml'),
     path = require('path');
 
+
   var Loader = function(environmentOrDb) {
     if (!environmentOrDb._db) {
       // it's an environment
@@ -14,9 +15,53 @@ module.exports = function() {
       this.db = environmentOrDb;
     }
 
+    this.graphFile = 'digraph messages {\n';
+
     require('./models/message')(this.db);
     require('./models/location')(this.db);
   }
+
+  function removeQuotes(string) {
+    return string.replace(/['"]+/g, '');
+  }
+
+  Loader.prototype.createGraphEdges = function(message) {
+    // find all addedMessages and addTrigger in message text
+    var addMessageArguments = /addMessage\(\s*([^)]+?)\s*\)/g
+    var addTriggerArguments = /addTrigger\(\s*\'([^\']+?)\'\s*\)/g
+    var text = message.getText();
+    var addedMessages = [];
+    while ((results = addMessageArguments.exec(text)) !== null) {
+      if (results[1]) {
+        // remove any escaped quotes
+        // then match things in between pairs of quotes
+        var argString = results[1].replace(/\\\'/, '');
+        var arguments = argString.match(/\'(.*?)\'/g);
+        if (arguments[1]) {
+          addedMessages.push(removeQuotes(arguments[1]));
+        }
+        if (arguments[4]) {
+          addedMessages.push(removeQuotes(arguments[4]));
+        }
+        // arguments[2] should be child - maybe useful for grouping or labeling
+      }
+    }
+    while ((results = addTriggerArguments.exec(text)) !== null) {
+      if (results[1]) {
+        addedMessages.push(removeQuotes(results[1]));
+      }
+    }
+
+    if (message.messagesLoaded().length > 0) {
+      addedMessages.push(message.messagesLoaded());
+    }
+
+    for(var i=0; i<addedMessages.length; i++) {
+      this.graphFile += message.getName() + ' -> ' + addedMessages[i] + ';\n';
+    }
+  }
+
+
 
   Loader.prototype.saveMessage = function(messageName, messageText, loadedMessages, namePrefix) {
     var newMessage = this.db.create('Message');
@@ -33,6 +78,7 @@ module.exports = function() {
     newMessage.compile();
     console.log('saving: ', messageName);
     this.db.save('Message', newMessage);
+    this.createGraphEdges(newMessage);
   }
 
   Loader.prototype.saveLocation = function(name, description, message_name) {
@@ -173,6 +219,9 @@ module.exports = function() {
       this.loadDirectory(path.resolve(__dirname, dir), '')
 
       // done.
+      this.graphFile += '}';
+      console.log('saving messages.gv');
+      fs.writeFileSync(path.resolve(__dirname, dir, 'messages.gv'), this.graphFile, {encoding: 'utf8'});
       console.log('goodbye');
       db.close();
 

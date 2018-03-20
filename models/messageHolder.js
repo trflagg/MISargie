@@ -156,24 +156,41 @@ module.exports = function(db, collectionName) {
 
     };
     MessageHolder.prototype.removeMessage = function(commandText) {
-        var replacedCommandText = commandTextRemovePeriods(commandText);
         var found = false;
+        var replacedCommandText = commandText;
+        if(commandText.hasOwnProperty('replace')) {
+           replacedCommandText = commandTextRemovePeriods(commandText);
+        }
 
         if (this._messages.hasOwnProperty(replacedCommandText)) {
             delete this._messages[replacedCommandText];
-        }
-        else {
+        } else {
           // try by name
-          for (messageText in this._messages) {
-            if (this._messages[messageText].message === commandText) {
-              delete this._messages[messageText];
-              found = true;
+          // regex?
+          if (commandText instanceof RegExp) {
+            for (messageText in this._messages) {
+              if (commandText.test(this._messages[messageText].message)) {
+               console.log(this._messages[messageText].message);
+                delete this._messages[messageText];
+               }
+            }
+          } else {
+            // string equality
+            for (messageText in this._messages) {
+              if (this._messages[messageText].message === commandText) {
+                delete this._messages[messageText];
+                found = true;
+              }
             }
           }
+
           // message not here, look in children
           if (!found) {
+            console.log(found);
             for (var childName in this._children) {
+                console.log(childName);
                 if (this._children.hasOwnProperty(childName)) {
+                  console.log(this._children[childName]);
                     this._children[childName].removeMessage(commandText);
                 }
             }

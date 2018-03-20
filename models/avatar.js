@@ -182,14 +182,12 @@ module.exports = function(db, collectionName) {
     };
 
     Avatar.prototype.runMessage = function*(commandText, child) {
-
         var underleveld = false;
 
         child = child ? child : '';
 
         // triggers
         var messageList = this._triggers.clone();
-
 
         // message being run
         var messageObject = this.message(commandText, child);
@@ -230,15 +228,16 @@ module.exports = function(db, collectionName) {
             throw new Error('Message ' + messageName + ' NOT FOUND.', null);
         }
 
-        var result = yield message.run(this);
-
-        result = yield this._runTriggerList(triggers, result);
-
         if (underleveld || this.recordsUnread(child)) {
             this.read(commandText, child);
         } else {
             this.removeMessage(commandText);
         }
+
+        var result = yield message.run(this);
+
+        result = yield this._runTriggerList(triggers, result);
+
         return result;
     };
 

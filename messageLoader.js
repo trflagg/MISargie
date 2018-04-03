@@ -63,7 +63,7 @@ module.exports = function() {
 
 
 
-  Loader.prototype.saveMessage = function(messageName, messageText, loadedMessages, namePrefix) {
+  Loader.prototype.saveMessage = async function(messageName, messageText, loadedMessages, namePrefix) {
     var newMessage = this.db.create('Message');
     if (namePrefix) {
       messageName = namePrefix + "_" + messageName;
@@ -77,7 +77,7 @@ module.exports = function() {
     }
     newMessage.compile();
     console.log('saving: ', messageName);
-    this.db.save('Message', newMessage);
+    await this.db.save('Message', newMessage);
     this.createGraphEdges(newMessage);
   }
 
@@ -90,7 +90,7 @@ module.exports = function() {
       this.db.save("Location", newLocation);
 }
 
-  Loader.prototype.processMsgsFile = function(dir, filename, namePrefix) {
+  Loader.prototype.processMsgsFile = async function(dir, filename, namePrefix) {
     var data = fs.readFileSync(path.resolve(dir, filename), {encoding: 'utf8'})
 
     // set messagePrefix
@@ -120,7 +120,7 @@ module.exports = function() {
                 }
                 else if (line == '#--') {
                     // new message
-                    this.saveMessage(messageName, text, loadedMessages, messagePrefix);
+                    await this.saveMessage(messageName, text, loadedMessages, messagePrefix);
                     text = '';
                     i++;
                     var messageName = /^# (\w+)/.exec(lines[i])[1];
@@ -131,17 +131,17 @@ module.exports = function() {
             }
         }
 
-        this.saveMessage(messageName, text, loadedMessages, messagePrefix);
+        await this.saveMessage(messageName, text, loadedMessages, messagePrefix);
     }
     else {
       // take off extension
       var messageName = /(\w+)\.\w+/.exec(filename)[1];
       var messageText = data;
-      this.saveMessage(messageName, messageText, filename);
+      await this.saveMessage(messageName, messageText, filename);
     }
   }
 
-  Loader.prototype.processYamlFile = function(dir, filename) {
+  Loader.prototype.processYamlFile = async function(dir, filename) {
     var data = fs.readFile(dir + filename, {encoding: 'utf8'});
     var doc = yaml.safeLoad(data);
 
@@ -149,7 +149,7 @@ module.exports = function() {
         obj = doc[i];
         // default: message
         if (typeof obj.type === 'undefined' || obj.type === 'message') {
-            this.saveMessage(obj.name, obj.text, [], '');
+            await this.saveMessage(obj.name, obj.text, [], '');
         }
 
         // location
@@ -165,7 +165,7 @@ module.exports = function() {
 
   var result = {}
 
-  Loader.prototype.loadDirectory = function(dir, namePrefix) {
+  Loader.prototype.loadDirectory = async function(dir, namePrefix) {
       // closure variable
       var loader = this;
 
@@ -188,18 +188,18 @@ module.exports = function() {
           if (filePrefix != '') {
             filePrefix = filePrefix + '_';
           }
-          this.loadDirectory(path.resolve(dir, file), filePrefix + file);
+          await this.loadDirectory(path.resolve(dir, file), filePrefix + file);
         } else {
           console.log('evaluating ' + path.resolve(dir, file));
 
           if (!file.startsWith('.')) {
               // check extension
               if (endsWith(file, '.msgs')) {
-                  loader.processMsgsFile(dir, file, namePrefix);
+                  await loader.processMsgsFile(dir, file, namePrefix);
               }
               else if (endsWith(file, '.yaml') || endsWith(file, '.yml')) {
                   //forget yaml for now
-                  //loader.processYamlFile(dir, file);
+                  //await loader.processYamlFile(dir, file);
               }
 
               console.log('saved ----------------------');
@@ -210,20 +210,20 @@ module.exports = function() {
       };
   }
 
-  Loader.prototype.startLoading = function(dir) {
+  Loader.prototype.startLoading = async function(dir) {
       // remove all to begin
-      this.db.deleteAll('Message');
+      await this.db.deleteAll('Message');
 
       var db = this.db;
       // load starting directory
-      this.loadDirectory(path.resolve(__dirname, dir), '')
+      await this.loadDirectory(path.resolve(__dirname, dir), '')
 
       // done.
       this.graphFile += '}';
       console.log('saving messages.gv');
       fs.writeFileSync(path.resolve(__dirname, dir, 'messages.gv'), this.graphFile, {encoding: 'utf8'});
       console.log('goodbye');
-      db.close();
+      await db.close();
 
   }
 

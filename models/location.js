@@ -1,9 +1,7 @@
 module.exports = function(db, collectionName) {
     var util = require('util'),
-        async = require('async'),
         Model = require('argieDB/model')(db),
         collectionName = collectionName || 'location';
-
 
     Location = function(doc) {
         Location.super_.call(this, doc);
@@ -34,17 +32,16 @@ module.exports = function(db, collectionName) {
 
 
         var doc = Location.super_.prototype.onSave(location);
-
         doc.name = location._name;
         doc.description = location._description
         doc.message = location._message;
-
         return doc;
     };
 
     Location.prototype.setName = function(name) {
         this._name = name;
     }
+
     Location.prototype.getName = function(name) {
         return this._name;
     }
@@ -52,6 +49,7 @@ module.exports = function(db, collectionName) {
     Location.prototype.setDescription = function(description) {
         this._description = description;
     }
+
     Location.prototype.getDescription = function() {
         return this._description;
     }
@@ -59,6 +57,7 @@ module.exports = function(db, collectionName) {
     Location.prototype.setMessage = function(message) {
         this._message = message;
     }
+
     Location.prototype.getMessage = function() {
         return this._message;
     }

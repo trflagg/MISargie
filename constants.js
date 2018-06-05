@@ -1,10 +1,10 @@
 
 module.exports = function() {
-   return {
-        waitString: '{% wait(%d) %}',
-        waitRegEx: /^{% wait\((\d+)\) %}$/,
+  return {
+    waitString: '{% wait(%d) %}',
+    waitRegEx: /^{% wait\((\d+)\) %}$/,
 
-        clearScreenString: '{% clearScreen() %}',
-        clearScreenRegEx: /^{% clearScreen\(\) %}$/
-   }
+    clearScreenString: '{% clearScreen() %}',
+    clearScreenRegEx: /^{% clearScreen\(\) %}$/
+  }
 }()

@@ -1,6 +1,7 @@
 module.exports = function(db, collectionName) {
 
   var util = require('util'),
+    _ = require('underscore'),
     MessageHolder = require('./messageHolder')(db),
     BNum = require('./bNum')(db),
     returnObject = {},
@@ -170,7 +171,10 @@ module.exports = function(db, collectionName) {
   };
 
   Avatar.prototype.removeTrigger = function(messageName) {
-    this._triggers.remove(messageName);
+    var index = this._triggers.indexOf(messageName);
+    if (index > -1) {
+      this._triggers.splice(index, 1);
+    }
   };
 
   Avatar.prototype.runMessage = async function(commandText, child) {
@@ -179,7 +183,7 @@ module.exports = function(db, collectionName) {
     child = child ? child : '';
 
     // triggers
-    var messageList = this._triggers.clone();
+    var messageList = _.clone(this._triggers);
 
     // message being run
     var messageObject = this.message(commandText, child);

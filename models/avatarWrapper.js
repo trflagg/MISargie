@@ -19,12 +19,6 @@ module.exports = function() {
     return this.avatar.getGlobal(global);
   };
 
-  AvatarWrapper.prototype.yield = function(time, message_id) {
-    this.avatar.setGlobal('yield', 1);
-    this.avatar.setYieldTime(time);
-    return this.avatar.setYieldMessage(message_id);
-  }
-
   AvatarWrapper.prototype.setBNum = function(name, value) {
     return this.avatar.setBNum(name, value);
   }
@@ -77,11 +71,28 @@ module.exports = function() {
     return this.avatar.popMessages();
   };
 
+  AvatarWrapper.prototype.addTimer = function(timeInSeconds, timerString, timerId) {
+    return this.avatar.addTimer(timeInSeconds, timerString, timerId);
+  };
+
+  AvatarWrapper.prototype.removeTimer = function(timerId) {
+    return this.avatar.removeTimer(timerId);
+  };
+
   AvatarWrapper.prototype.registerFunction = function(func) {
     this[func.functionName] = function() {
       return func.functionBody.apply(this, arguments);
     }
   };
+
+  AvatarWrapper.prototype.addYield = function(time, message_id, child) {
+    var datetime = new Date() + time * 1000;
+    var y = {
+      datetime: datetime,
+      message: message_id,
+    };
+    return this.avatar.setYield(y, child);
+  }
 
   return AvatarWrapper;
 

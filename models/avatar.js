@@ -18,9 +18,8 @@ module.exports = function(db, collectionName) {
     this._location = null;
     this._globals = {};
     this._bNums = {};
-    this._yieldTime = null;
-    this._yieldMessage = null;
     this._triggers = [];
+    this._timers = {};
   };
 
   Avatar.prototype.loadFromDoc = function(doc) {
@@ -38,9 +37,8 @@ module.exports = function(db, collectionName) {
         }
       }
     }
-    if(doc.yieldTime) this._yieldTime = doc.yieldTimer;
-    if(doc.yieldMessage) this._yieldMessage = doc.yieldMessage;
     if(doc.triggers) this._triggers = doc.triggers;
+    if(doc.timers) this._timers = doc.timers;
   };
 
   Avatar.prototype.saveToDoc = function(doc) {
@@ -55,9 +53,8 @@ module.exports = function(db, collectionName) {
         doc.bNums[key] = bNum.onSave(bNum);
       }
     }
-    doc.yieldTime = this._yieldTime;
-    doc.yieldMessage = this._yieldMessage;
     doc.triggers = this._triggers;
+    doc.timers = this._timers;
 
     return doc;
   };
@@ -67,6 +64,7 @@ module.exports = function(db, collectionName) {
     this._globals = {};
     this._bnums = {};
     this._triggers = [];
+    this._timers = {};
   };
 
   Avatar.prototype.setGlobal = function(key, value) {
@@ -131,40 +129,6 @@ module.exports = function(db, collectionName) {
       throw e;
     }
   };
-
-  Avatar.prototype.setYieldTime = function(timeInSeconds) {
-    var currentTime = Date.now();
-    var futureTime = currentTime + (parseInt(timeInSeconds, 10) * 1000);
-    this._yieldTime = new Date(futureTime);
-  };
-
-  Avatar.prototype.getYieldTime = function() {
-    return this._yieldTime;
-  };
-
-  Avatar.prototype.setYieldMessage = function(messageName) {
-    this._yieldMessage = messageName;
-  };
-
-  Avatar.prototype.getYieldMessage = function() {
-    return this._yieldMessage;
-  };
-
-  Avatar.prototype.pollForYield = async function() {
-    if (this.getGlobal('yield') == 1) {
-      if (Date.now() >= this._yieldTime) {
-        this.setGlobal('yield', 0);
-        try {
-          const message = await db.load('Message', {name: this._yieldMessage});
-          return message.run(this, callback);
-        } catch(e) {
-          console.error('Error in Avatar.pollForYield');
-          console.error(e);
-          throw e;
-        }
-      }
-    }
-  }
 
   Avatar.prototype.addTrigger = function(messageName) {
     this._triggers.push(messageName);
@@ -264,6 +228,18 @@ module.exports = function(db, collectionName) {
       console.error(e);
       throw e;
     }
+  };
+
+  Avatar.prototype.addTimer = function(timeInSeconds, timerString, timerId) {
+    this._timers[timerId] = {
+      timeInSeconds: timeInSeconds,
+      timerString: timerString,
+    };
+    console.log(`addTimer ${timerId}`);
+  };
+
+  Avatar.prototype.removeTimer = function(timerId) {
+    delete this._timers[timerId]
   };
 
   db.register('Avatar', Avatar);

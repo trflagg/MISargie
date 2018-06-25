@@ -1,6 +1,6 @@
 module.exports = function(db, collectionName) {
   var util = require('util'),
-    underscore = require('underscore'),
+    _ = require('lodash'),
     Model = require('argieDB/model')(db),
     System = require('./systemWrapper'),
     AvatarWrapper = require('./avatarWrapper'),
@@ -90,7 +90,7 @@ module.exports = function(db, collectionName) {
       return null;
     }
 
-    this._compiled = underscore.template(this._text);
+    this._compiled = _.template(this._text);
     return this._compiled;
   }
 

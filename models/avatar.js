@@ -1,7 +1,7 @@
 module.exports = function(db, collectionName) {
 
   var util = require('util'),
-    _ = require('underscore'),
+    _ = require('lodash'),
     MessageHolder = require('./messageHolder')(db),
     BNum = require('./bNum')(db),
     returnObject = {},
@@ -20,6 +20,7 @@ module.exports = function(db, collectionName) {
     this._bNums = {};
     this._triggers = [];
     this._timers = {};
+    this._yields = [];
   };
 
   Avatar.prototype.loadFromDoc = function(doc) {
@@ -39,6 +40,7 @@ module.exports = function(db, collectionName) {
     }
     if(doc.triggers) this._triggers = doc.triggers;
     if(doc.timers) this._timers = doc.timers;
+    if(doc._yields) this._yields = doc._yields;
   };
 
   Avatar.prototype.saveToDoc = function(doc) {
@@ -55,6 +57,7 @@ module.exports = function(db, collectionName) {
     }
     doc.triggers = this._triggers;
     doc.timers = this._timers;
+    doc._yields = this._yields;
 
     return doc;
   };
@@ -65,6 +68,7 @@ module.exports = function(db, collectionName) {
     this._bnums = {};
     this._triggers = [];
     this._timers = {};
+    this._yields = [];
   };
 
   Avatar.prototype.setGlobal = function(key, value) {
@@ -207,6 +211,21 @@ module.exports = function(db, collectionName) {
 
   };
 
+  Avatar.prototype.runMessageName = async function(messageName) {
+    try {
+      console.log(`runMessageName: ${messageName}`);
+      var message = await db.load('Message', {name: messageName});
+      if (!message) {
+        throw new Error('runMessage: Message ' + messageName + ' NOT FOUND', null);
+      }
+      return await message.run(this);
+    } catch(e) {
+      console.error('error in Avatar.runMessageName');
+      console.error(e);
+      throw e;
+    }
+  };
+
   Avatar.prototype._runTriggerList = async function(triggers, result) {
     for(var i=0, ll=triggers.length; i<ll; i++) {
       var trigger_result = await triggers[i].run(this);
@@ -235,11 +254,37 @@ module.exports = function(db, collectionName) {
       timeInSeconds: timeInSeconds,
       timerString: timerString,
     };
-    console.log(`addTimer ${timerId}`);
   };
 
   Avatar.prototype.removeTimer = function(timerId) {
     delete this._timers[timerId]
+  };
+
+  Avatar.prototype.addYield = function(y) {
+    this._yields.push(y);
+  }
+
+  Avatar.prototype.removeYield = function(messageName) {
+    _.remove(this._yields, function(y) { return y.message == messageName });
+  }
+
+  Avatar.prototype.nextYield = function(currentDatetime) {
+    currentDatetime = currentDatetime || new Date();
+    var yields = this._yields;
+    if (yields.length <= 0) {
+      return null;
+    }
+    var nextYield = _.minBy(yields, 'datetime');
+    return nextYield;
+  };
+
+  Avatar.prototype.nextYieldOffset = function(currentDatetime) {
+    currentDatetime = currentDatetime || new Date();
+    var nextYield = this.nextYield(currentDatetime);
+    if (nextYield) {
+      return Date.parse(nextYield.datetime) - currentDatetime.getTime();
+    }
+    return null;
   };
 
   db.register('Avatar', Avatar);

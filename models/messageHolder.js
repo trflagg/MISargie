@@ -16,7 +16,6 @@ module.exports = function(db, collectionName) {
     this._recordUnread = false;
     this._newMessageText = null;
     this._visible = true;
-    this._yields = [];
 
     this._supportsLevels = false;
     this._level = 1;
@@ -33,7 +32,6 @@ module.exports = function(db, collectionName) {
     if(doc._visible) this._visible = doc._visible;
     if(doc._level) this._level = doc._level;
     if(doc._supportsLevels) this._supportsLevels = doc._supportsLevels;
-    if(doc._yields) this._yields = doc._yields;
 
     // make a new messageHolder object for every child in doc
     if (doc._children) {
@@ -58,7 +56,6 @@ module.exports = function(db, collectionName) {
     doc._visible = this._visible;
     doc._level = this._level;
     doc._supportsLevels = this._supportsLevels;
-    doc._yields = this._yields;
 
     return doc;
   }
@@ -340,33 +337,6 @@ module.exports = function(db, collectionName) {
     }
 
     return this._recordUnread;
-  }
-
-  MessageHolder.prototype.setYield = function(y, child) {
-    if (child) {
-      var childArray = childArrayFromString(child);
-      return this.child(childArray[1]).setYield(y, childArray[2]);
-    }
-    else {
-      this._yields.push(y);
-    }
-  }
-
-  MessageHolder.prototype.pollForYield = function(currentDatetime) {
-    var results = [];
-
-    for (var i=0; i<this._yields.length; i++) {
-      if (currentDatetime < this._yields[i].datetime) {
-        results.push(this._yields[i]);
-      }
-    }
-    for (var childName in this._children) {
-      if (this._children.hasOwnProperty(childName)) {
-        results.concat(this._children[childName].pollForYield(currentDatetime));
-      }
-    }
-
-    return results;
   }
 
   MessageHolder.prototype.read = function(commandText, child) {

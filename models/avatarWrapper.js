@@ -79,20 +79,24 @@ module.exports = function() {
     return this.avatar.removeTimer(timerId);
   };
 
+  AvatarWrapper.prototype.addYield = function(time, message_id, child) {
+    var datetime = new Date(Date.now() + (time * 1000));
+    var y = {
+      datetime: datetime,
+      message: message_id,
+    };
+    return this.avatar.addYield(y, child);
+  }
+
+  AvatarWrapper.prototype.removeYield = function(message_id) {
+    return this.avatar.removeYield(message_id);
+  }
+
   AvatarWrapper.prototype.registerFunction = function(func) {
     this[func.functionName] = function() {
       return func.functionBody.apply(this, arguments);
     }
   };
-
-  AvatarWrapper.prototype.addYield = function(time, message_id, child) {
-    var datetime = new Date() + time * 1000;
-    var y = {
-      datetime: datetime,
-      message: message_id,
-    };
-    return this.avatar.setYield(y, child);
-  }
 
   return AvatarWrapper;
 

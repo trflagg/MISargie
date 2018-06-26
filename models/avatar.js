@@ -213,7 +213,6 @@ module.exports = function(db, collectionName) {
 
   Avatar.prototype.runMessageName = async function(messageName) {
     try {
-      console.log(`runMessageName: ${messageName}`);
       var message = await db.load('Message', {name: messageName});
       if (!message) {
         throw new Error('runMessage: Message ' + messageName + ' NOT FOUND', null);

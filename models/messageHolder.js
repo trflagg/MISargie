@@ -169,7 +169,7 @@ module.exports = function(db, collectionName) {
       replacedCommandText = commandTextRemovePeriods(commandText);
     }
 
-    if (this._messages.hasOwnProperty(replacedCommandText)) {
+    if (this._messages && this._messages.hasOwnProperty(replacedCommandText)) {
       delete this._messages[replacedCommandText];
     } else {
       // try by name
@@ -177,7 +177,6 @@ module.exports = function(db, collectionName) {
       if (commandText instanceof RegExp) {
         for (messageText in this._messages) {
           if (commandText.test(this._messages[messageText].message)) {
-            console.log(this._messages[messageText].message);
             delete this._messages[messageText];
           }
         }
@@ -193,11 +192,8 @@ module.exports = function(db, collectionName) {
 
       // message not here, look in children
       if (!found) {
-        console.log(found);
         for (var childName in this._children) {
-          console.log(childName);
           if (this._children.hasOwnProperty(childName)) {
-            console.log(this._children[childName]);
             this._children[childName].removeMessage(commandText);
           }
         }

@@ -110,6 +110,7 @@ module.exports = function(db, collectionName) {
         var msgObject = {};
         for(var i=0, ll=messages.length; i<ll; i++) {
           msgObject[messages[i].getName()] = messages[i];
+          console.log(messages[i].getName());
         }
         system.loadedMessages = msgObject;
       }

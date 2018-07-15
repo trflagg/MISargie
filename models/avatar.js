@@ -193,7 +193,7 @@ module.exports = function(db, collectionName) {
         throw new Error('Message ' + messageName + ' NOT FOUND.', null);
       }
 
-      if (underleveld || this.recordsUnread(child)) {
+      if (this.recordsUnread(child)) {
         this.read(commandText, child);
       } else {
         this.removeMessage(commandText);

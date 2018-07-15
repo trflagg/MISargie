@@ -139,10 +139,7 @@ module.exports = function(db, collectionName) {
   };
 
   Avatar.prototype.removeTrigger = function(messageName) {
-    var index = this._triggers.indexOf(messageName);
-    if (index > -1) {
-      this._triggers.splice(index, 1);
-    }
+    _.pull(this._triggers, messageName);
   };
 
   Avatar.prototype.runMessage = async function(commandText, child) {

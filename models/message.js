@@ -116,6 +116,7 @@ module.exports = function(db, collectionName) {
       }
 
       // kick it off
+      console.log(this._name);
       result = this._compiled({
         avatar: avatarWrapper,
         system: system

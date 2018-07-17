@@ -19,6 +19,7 @@ module.exports = function(db, collectionName) {
 
     this._supportsLevels = false;
     this._level = 1;
+    this._data = {};
   }
 
   MessageHolder.prototype.loadFromDoc = function(doc) {
@@ -32,6 +33,7 @@ module.exports = function(db, collectionName) {
     if(doc._visible) this._visible = doc._visible;
     if(doc._level) this._level = doc._level;
     if(doc._supportsLevels) this._supportsLevels = doc._supportsLevels;
+    if(doc._data) this._data = doc._data;
 
     // make a new messageHolder object for every child in doc
     if (doc._children) {
@@ -56,6 +58,7 @@ module.exports = function(db, collectionName) {
     doc._visible = this._visible;
     doc._level = this._level;
     doc._supportsLevels = this._supportsLevels;
+    doc._data = this._data;
 
     return doc;
   }
@@ -66,6 +69,13 @@ module.exports = function(db, collectionName) {
 
   MessageHolder.prototype.getName = function() {
     return this._name;
+  }
+
+  MessageHolder.prototype.setData = function(key, data) {
+    this._data[key] = data;
+  }
+  MessageHolder.getData = function(key) {
+    return this._data[key];
   }
 
   MessageHolder.prototype.pushMessages = function() {
@@ -249,6 +259,8 @@ module.exports = function(db, collectionName) {
         var obj = {}
         var child = this._children[childName];
         obj.visible = child._visible;
+        obj.name = child._name;
+        obj.data = child._data;
         obj.childMessageCount = child.childMessageCount();
         obj.text = childName
         if (child._supportsLevels) {

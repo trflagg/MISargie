@@ -1,6 +1,6 @@
-module.exports = function(db) {
+module.exports = async function(db) {
 
-  const MessageModel = require('../models/message')(db);
+  await require('../models/message')(db).initialize();
 
   const messageHandler = {
     loadAllMessages: async () => {

@@ -1,10 +1,9 @@
-module.exports = function(db, collectionName) {
+module.exports = function(db) {
   var util = require('util'),
     _ = require('lodash'),
     Model = require('argieDB/model')(db),
     System = require('./systemWrapper'),
     AvatarWrapper = require('./avatarWrapper'),
-    collectionName = collectionName || 'messages';
 
   Message = function(doc) {
     Message.super_.call(this, doc);
@@ -132,5 +131,10 @@ module.exports = function(db, collectionName) {
 
   db.register('Message', Message);
 
-  return Message;
+  return {
+    initialize: async function() {
+      db.createIndex('Message', {name: 1}, {unique: true});
+    }
+  }
+
 };

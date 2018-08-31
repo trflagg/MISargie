@@ -49,6 +49,10 @@ module.exports = async function(db) {
         }
         throw error;
       }
+    },
+
+    deleteMessage: async messageProps => {
+      return await db.removeById('Message', ObjectID(messageProps.id));
     }
   }
 

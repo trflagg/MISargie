@@ -134,6 +134,7 @@ module.exports = function(db) {
   return {
     initialize: async function() {
       db.createIndex('Message', {name: 1}, {unique: true});
+      return Message;
     }
   }
 

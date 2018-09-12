@@ -38,7 +38,20 @@ module.exports = async function(db) {
         }
         throw error;
       }
-    }
+    },
+
+    restartGame: async characterProps => {
+      return await characterHandler.startGame(characterProps);
+    },
+
+    startGame: async characterProps => {
+      const character = await db.load('Character', {
+        _id: ObjectID(characterProps.id)
+      });
+      await character.startGame();
+      await db.save('Character', character);
+      return character;
+    },
   }
 
   return characterHandler;

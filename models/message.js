@@ -104,7 +104,7 @@ module.exports = function(db) {
     // load any messages
     try {
       var messagesLoaded = this.messagesLoaded();
-      if (messagesLoaded.length > 0) {
+      if (messagesLoaded && messagesLoaded.length > 0) {
         var messages = await db.loadMultiple('Message', {name: { $in: messagesLoaded}});
         var msgObject = {};
         for(var i=0, ll=messages.length; i<ll; i++) {

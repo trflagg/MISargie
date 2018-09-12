@@ -17,6 +17,7 @@ module.exports = async function(db) {
 
     saveMessageObject: async message => {
       try {
+        message.compile();
         await db.save('Message', message);
         return message;
       } catch (error) {

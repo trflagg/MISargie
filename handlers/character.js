@@ -52,6 +52,17 @@ module.exports = async function(db) {
       await db.save('Character', character);
       return character;
     },
+
+    runMessage: async (characterProps, messageName) => {
+      const character = await db.load('Character', {
+        _id: ObjectID(characterProps.id)
+      });
+      const result = await character.runMessage(messageName);
+      character.lastResult = result;
+      await db.save('Character', character);
+      return character;
+    },
+
   }
 
   return characterHandler;

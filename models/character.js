@@ -11,12 +11,14 @@ module.exports = function(db) {
     Character.super_.prototype.initialize.call(this);
 
     this.lastResult = '';
+    this.ownerID = null;
   }
 
   Character.prototype.saveToDoc = function(doc) {
     Character.super_.prototype.saveToDoc.call(this, doc);
 
     doc.lastResult = this.lastResult;
+    doc.ownerID = this.ownerID;
 
     return doc;
   }
@@ -25,6 +27,7 @@ module.exports = function(db) {
     Character.super_.prototype.loadFromDoc.call(this, doc);
 
     if(doc.lastResult) this.lastResult = doc.lastResult;
+    if(doc.ownerID) this.ownerID = doc.ownerID;
   }
 
   Character.prototype.setFirstName = function(firstName) {
@@ -55,7 +58,6 @@ module.exports = function(db) {
     this.lastResult = await this.runMessageName('INIT');
     return this;
   }
-
 
   db.register('Character', Character);
 

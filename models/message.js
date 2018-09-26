@@ -14,6 +14,7 @@ module.exports = function(db) {
         throw 'Message load error. doc not found';
       }
       // load from doc
+      this._storyID = doc.storyID;
       this._name = doc.name;
       this._text = doc.text;
       this._compiled = doc.compiled;
@@ -22,6 +23,7 @@ module.exports = function(db) {
     }
     else {
       // make new Message
+      this._storyID = null;
       this._name = null;
       this._text = null;
       this._compiled = {};
@@ -39,6 +41,7 @@ module.exports = function(db) {
 
     var doc = Message.super_.prototype.onSave(message);
     doc.name = message._name;
+    doc.storyID = message._storyID;
     doc.text = message._text;
     doc.compiled = message._compiled;
     doc.messagesLoaded = message._messagesLoaded;

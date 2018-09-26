@@ -12,6 +12,7 @@ module.exports = function(db) {
 
     this.lastResult = '';
     this.ownerID = null;
+    this.storyID = null;
   }
 
   Character.prototype.saveToDoc = function(doc) {
@@ -19,6 +20,7 @@ module.exports = function(db) {
 
     doc.lastResult = this.lastResult;
     doc.ownerID = this.ownerID;
+    doc.storyID = this.storyID;
 
     return doc;
   }
@@ -28,6 +30,7 @@ module.exports = function(db) {
 
     if(doc.lastResult) this.lastResult = doc.lastResult;
     if(doc.ownerID) this.ownerID = doc.ownerID;
+    if(doc.storyID) this.storyID = doc.storyID;
   }
 
   Character.prototype.setFirstName = function(firstName) {

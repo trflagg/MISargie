@@ -1,43 +1,6 @@
 {
-  "_args": [
-    [
-      "argie@git://github.com/trflagg/argie.git",
-      "/Users/trflagg/Dropbox/bamboo_7/PROJECTS/MakeItSo"
-    ]
-  ],
-  "_from": "git://github.com/trflagg/argie.git",
-  "_id": "argie@0.0.1",
-  "_inCache": true,
-  "_installable": true,
-  "_location": "/argie",
-  "_phantomChildren": {},
-  "_requested": {
-    "hosted": {
-      "directUrl": "https://raw.githubusercontent.com/trflagg/argie/master/package.json",
-      "gitUrl": "git://github.com/trflagg/argie.git",
-      "httpsUrl": "git+https://github.com/trflagg/argie.git",
-      "shortcut": "github:trflagg/argie",
-      "ssh": "git@github.com:trflagg/argie.git",
-      "sshUrl": "git+ssh://git@github.com/trflagg/argie.git",
-      "type": "github"
-    },
-    "name": "argie",
-    "raw": "argie@git://github.com/trflagg/argie.git",
-    "rawSpec": "git://github.com/trflagg/argie.git",
-    "scope": null,
-    "spec": "git://github.com/trflagg/argie.git",
-    "type": "hosted"
-  },
-  "_requiredBy": [
-    "/"
-  ],
-  "_resolved": "git://github.com/trflagg/argie.git#0d190331f8d275bf38ef93f9a4059ef8c5e76f0d",
-  "_shasum": "4f0c94b068aa529c5752eae5c87f2d52a29742b0",
-  "_shrinkwrap": null,
-  "_spec": "argie@git://github.com/trflagg/argie.git",
-  "_where": "/Users/trflagg/Dropbox/bamboo_7/PROJECTS/MakeItSo",
   "bugs": {
-    "url": "https://github.com/trflagg/argie/issues"
+    "url": "https://github.com/trflagg/MISargie/issues"
   },
   "dependencies": {
     "argieDB": "git://github.com/trflagg/argieDB.git",
@@ -52,8 +15,7 @@
   },
   "description": "argie =====",
   "devDependencies": {},
-  "gitHead": "0d190331f8d275bf38ef93f9a4059ef8c5e76f0d",
-  "homepage": "https://github.com/trflagg/argie#readme",
+  "homepage": "https://github.com/trflagg/MISargie",
   "name": "argie",
   "optionalDependencies": {},
   "private": true,
@@ -61,7 +23,7 @@
   "readmeFilename": "README.md",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/trflagg/argie.git"
+    "url": "git+https://github.com/trflagg/MISargie.git"
   },
   "scripts": {
     "test": "node tests/runTests"
